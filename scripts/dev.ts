@@ -14,11 +14,20 @@ const __dirname = dirname(__filename)
 const projectRoot = join(__dirname, '..')
 const cliPath = join(projectRoot, 'src/entrypoints/cli.tsx')
 
+// React production mode — prevents 6,889+ _debugStack Error objects
+// (12MB) from accumulating during long-running sessions.
+// Opt-in via CLAUDE_CODE_FORCE_NODE_ENV=production for dev sessions that
+// need the memory optimization. Default keeps NODE_ENV='development' so
+// dev-only diagnostics (DevBar, doctorDiagnostic, AutoUpdater dev branches,
+// etc.) continue to work.
+const forcedNodeEnv =
+  process.env.CLAUDE_CODE_FORCE_NODE_ENV ??
+  process.env.NODE_ENV ??
+  'development'
+
 const defines = {
   ...getMacroDefines(),
-  // React production mode — prevents 6,889+ _debugStack Error objects
-  // (12MB) from accumulating during long-running sessions.
-  'process.env.NODE_ENV': JSON.stringify('production'),
+  'process.env.NODE_ENV': JSON.stringify(forcedNodeEnv),
 }
 
 const defineArgs = Object.entries(defines).flatMap(([k, v]) => [

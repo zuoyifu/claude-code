@@ -105,6 +105,10 @@ function getEntriesByName(name: string, type?: string): PerformanceEntryLike[] {
   return entries.filter(e => e.name === name)
 }
 
+function getEntries(): PerformanceEntryLike[] {
+  return [...getEntriesByType('mark'), ...getEntriesByType('measure')]
+}
+
 function clearMarks(name?: string): void {
   if (name !== undefined) {
     marks.delete(name)
@@ -128,6 +132,7 @@ const shim = {
   now,
   mark,
   measure: measure as typeof performance.measure,
+  getEntries: getEntries as typeof performance.getEntries,
   getEntriesByType: getEntriesByType as typeof performance.getEntriesByType,
   getEntriesByName: getEntriesByName as typeof performance.getEntriesByName,
   clearMarks: clearMarks as typeof performance.clearMarks,
