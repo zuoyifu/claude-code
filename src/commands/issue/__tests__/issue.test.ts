@@ -50,6 +50,11 @@ let _dynamicSessionId = `issue-test-${randomUUID()}`
 // the combined suite (alphabetical: 'autofix-pr' < 'issue') and expects
 // '/mock/cwd'. Issue's beforeAll switches this on, afterAll switches off.
 let useIssueDynamicState = false
+// Default OFF — the long-body draft-save test below flips this on for its
+// body (so execFile/execFileSync return ENOENT + a fake GitHub remote URL)
+// then flips off in finally. Without the flag the child_process stub leaked
+// process-globally into every later test file via Bun's mock.module cache.
+let useIssueLongBodyCpStubs = false
 mock.module('src/bootstrap/state.js', () => ({
   ...stateMock(),
   getSessionId: () =>
@@ -541,26 +546,40 @@ describe('issue command — with title', () => {
     // Force the fallback URL branch with a *parsed* GitHub remote so the
     // draft-path output (lines 392-393) is reached: git remote returns a
     // GitHub URL but `gh --version` fails so hasGh is false.
-    mock.module('node:child_process', () => ({
-      execFile: (
-        _cmd: string,
-        _args: string[],
-        _opts: unknown,
-        cb: (err: Error | null, stdout: string, stderr: string) => void,
-      ) => cb(new Error('ENOENT'), '', ''),
-      execFileSync: (cmd: string) => {
-        if (cmd === 'git')
-          return Buffer.from('https://github.com/owner/repo.git\n')
-        throw new Error('ENOENT')
-      },
-      exec: () => {},
-      execSync: () => Buffer.from(''),
-      spawn: () => ({}),
-      spawnSync: () => ({ status: 0, stdout: Buffer.from('') }),
-      fork: () => ({}),
-      ChildProcess: class {},
-      _forkChild: () => {},
-    }))
+    //
+    // Spread+flag pattern: the previous bare `mock.module(...)` here leaked
+    // a stub child_process to every later test file in the same `bun test`
+    // run (mock.module is process-global, last-write-wins). Now we register
+    // a flag-gated mock that delegates to real child_process by default, and
+    // only flips on for THIS test's body.
+    mock.module('node:child_process', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const real = require('node:child_process') as Record<string, unknown>
+      return {
+        ...real,
+        default: real,
+        execFile: ((...args: unknown[]) => {
+          if (useIssueLongBodyCpStubs) {
+            const cb = args[3] as
+              | ((e: Error | null, s: string, e2: string) => void)
+              | undefined
+            if (cb) cb(new Error('ENOENT'), '', '')
+            return
+          }
+          return (real.execFile as (...a: unknown[]) => unknown)(...args)
+        }) as typeof real.execFile,
+        execFileSync: ((...args: unknown[]) => {
+          if (useIssueLongBodyCpStubs) {
+            const cmd = args[0] as string
+            if (cmd === 'git')
+              return Buffer.from('https://github.com/owner/repo.git\n')
+            throw new Error('ENOENT')
+          }
+          return (real.execFileSync as (...a: unknown[]) => unknown)(...args)
+        }) as typeof real.execFileSync,
+      }
+    })
+    useIssueLongBodyCpStubs = true
     Array.prototype.slice = function (
       this: unknown[],
       start?: number,
@@ -586,6 +605,7 @@ describe('issue command — with title', () => {
     } finally {
       Array.prototype.slice = origSlice
       setOriginalCwd(origCwd)
+      useIssueLongBodyCpStubs = false
     }
   })
 })
