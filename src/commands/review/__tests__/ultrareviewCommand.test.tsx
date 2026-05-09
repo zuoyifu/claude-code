@@ -1,18 +1,24 @@
 /**
- * Regression tests for ultrareviewCommand preflight integration.
- * Uses real fetchUltrareviewPreflight with axios mocked to verify the three
- * action paths: proceed / confirm / blocked.
+ * Regression tests for `ultrareviewCommand.call` (src/commands/review/
+ * ultrareviewCommand.tsx). The previous version of `call` made an axios
+ * preflight POST and branched on `action: proceed | blocked | confirm`;
+ * that integration was removed and `call` now branches on `checkOverageGate()`'s
+ * four `kind` values: `not-enabled`, `low-balance`, `needs-confirm`, `proceed`.
  *
- * NOTE: 4 of 6 tests are isolation flakes, not pollution. The current
- * ultrareviewCommand.tsx source does not call fetchUltrareviewPreflight
- * (the preflight axios path was removed), so blocked/confirm/PR-args tests
- * can never observe the mocked axios path — they fall through to the
- * launchRemoteReview mock returning "Launched successfully." The two passing
- * tests (proceed action / null preflight network failure) match that
- * behavior. Out of scope for the test-flake-fix pass; needs source review
- * to either restore preflight or rewrite tests.
+ * These tests verify each branch:
+ *   - `proceed` → forwards billingNote and args to `launchRemoteReview`,
+ *     calls `onDone(text)`, returns null
+ *   - `not-enabled` → onDone with paywall message + `display: 'system'`,
+ *     returns null, does NOT launch
+ *   - `low-balance` → onDone with balance-too-low message including the
+ *     available amount, returns null, does NOT launch
+ *   - `needs-confirm` → returns the React `UltrareviewOverageDialog` element,
+ *     does NOT call onDone, does NOT launch
+ *   - `proceed` + null launch result → onDone with "failed to launch" message
+ *   - `proceed` + arg pass-through → args (e.g. PR number) reach launchRemoteReview
+ *     verbatim (call doesn't parse them itself)
  */
-import { afterAll, describe, expect, mock, test } from 'bun:test';
+import { afterAll, beforeEach, describe, expect, mock, test } from 'bun:test';
 import { debugMock } from '../../../../tests/mocks/debug.js';
 import { logMock } from '../../../../tests/mocks/log.js';
 import { setupAxiosMock } from '../../../../tests/mocks/axios.js';
@@ -54,11 +60,26 @@ mock.module('src/utils/auth.js', () => ({
   isEnterpriseSubscriber: () => false,
 }));
 
-// Mock checkOverageGate to always return proceed (gate logic tested separately)
+// Mock checkOverageGate with a mutable gate result so each test can drive
+// the four branches in ultrareviewCommand.call (not-enabled, low-balance,
+// needs-confirm, proceed). launchRemoteReview captures args for the
+// args-forwarding test, and its return value is mutable too — `null` triggers
+// the "failed to launch" onDone branch.
+type GateResult =
+  | { kind: 'proceed'; billingNote: string }
+  | { kind: 'not-enabled' }
+  | { kind: 'low-balance'; available: number }
+  | { kind: 'needs-confirm' };
+let _gateResult: GateResult = { kind: 'proceed', billingNote: '' };
+let _launchResult: Array<{ type: 'text'; text: string }> | null = [{ type: 'text', text: 'Launched successfully.' }];
+const _capturedLaunchArgs: string[] = [];
 mock.module('src/commands/review/reviewRemote.js', () => ({
-  checkOverageGate: async () => ({ kind: 'proceed', billingNote: '' }),
+  checkOverageGate: async () => _gateResult,
   confirmOverage: () => {},
-  launchRemoteReview: async () => [{ type: 'text', text: 'Launched successfully.' }],
+  launchRemoteReview: async (args: string) => {
+    _capturedLaunchArgs.push(args);
+    return _launchResult;
+  },
 }));
 
 // Mock OAuth config so real fetchUltrareviewPreflight can run
@@ -173,28 +194,32 @@ const makeContext = () =>
     abortController: { signal: {} },
   }) as Parameters<typeof call>[1];
 
-describe('ultrareviewCommand preflight integration', () => {
-  test('proceed action: launches immediately without dialog', async () => {
-    mockAxiosPost.mockImplementationOnce(async () => ({
-      status: 200,
-      data: { action: 'proceed', billing_note: null },
-    }));
+describe('ultrareviewCommand.call: gate branches', () => {
+  // Reset gate + launch state between tests so a previous test's mutation
+  // doesn't leak into the next.
+  beforeEach(() => {
+    _gateResult = { kind: 'proceed', billingNote: '' };
+    _launchResult = [{ type: 'text', text: 'Launched successfully.' }];
+    _capturedLaunchArgs.length = 0;
+  });
+
+  test('proceed gate: forwards billingNote to launchRemoteReview, calls onDone, returns null', async () => {
+    _gateResult = { kind: 'proceed', billingNote: ' Free review 1 of 5.' };
 
     const messages: string[] = [];
     const onDone = (msg: string) => messages.push(msg);
 
     const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
-    // Should not render a dialog — returns null after calling onDone
+
     expect(result).toBeNull();
     expect(messages.length).toBe(1);
     expect(messages[0]).toContain('Launched successfully');
+    // launchRemoteReview was invoked exactly once with the empty args.
+    expect(_capturedLaunchArgs).toEqual(['']);
   });
 
-  test('blocked action: calls onDone with unavailable message', async () => {
-    mockAxiosPost.mockImplementationOnce(async () => ({
-      status: 200,
-      data: { action: 'blocked', billing_note: null },
-    }));
+  test('not-enabled gate: onDone with paywall message, returns null', async () => {
+    _gateResult = { kind: 'not-enabled' };
 
     const messages: string[] = [];
     const opts: Array<unknown> = [];
@@ -204,70 +229,84 @@ describe('ultrareviewCommand preflight integration', () => {
     };
 
     const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
+
     expect(result).toBeNull();
-    expect(messages.length).toBe(1);
-    expect(messages[0]).toBe('Ultrareview is currently unavailable.');
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('Free ultrareviews used');
+    expect(messages[0]).toContain('claude.ai/settings/billing');
+    expect((opts[0] as { display: string }).display).toBe('system');
+    // launchRemoteReview must NOT be called when paywalled.
+    expect(_capturedLaunchArgs).toEqual([]);
+  });
+
+  test('low-balance gate: onDone with balance-too-low message including available amount, returns null', async () => {
+    _gateResult = { kind: 'low-balance', available: 4.5 };
+
+    const messages: string[] = [];
+    const opts: Array<unknown> = [];
+    const onDone = (msg: string, opt: unknown) => {
+      messages.push(msg);
+      opts.push(opt);
+    };
+
+    const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
+
+    expect(result).toBeNull();
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('Balance too low');
+    expect(messages[0]).toContain('$4.50');
+    expect(messages[0]).toContain('claude.ai/settings/billing');
+    expect((opts[0] as { display: string }).display).toBe('system');
+    expect(_capturedLaunchArgs).toEqual([]);
+  });
+
+  test('needs-confirm gate: returns UltrareviewOverageDialog React element, does not launch', async () => {
+    _gateResult = { kind: 'needs-confirm' };
+
+    const messages: string[] = [];
+    const onDone = (msg: string) => messages.push(msg);
+
+    const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
+
+    // Returns a React element rather than null.
+    expect(result).not.toBeNull();
+    expect(typeof result).toBe('object');
+    const element = result as { type: unknown };
+    expect(element.type).toBeDefined();
+    // No onDone call until the user interacts with the dialog.
+    expect(messages).toEqual([]);
+    expect(_capturedLaunchArgs).toEqual([]);
+  });
+
+  test('proceed gate + launchRemoteReview returns null: onDone with failure message', async () => {
+    _gateResult = { kind: 'proceed', billingNote: '' };
+    _launchResult = null; // teleport / non-github failure path
+
+    const messages: string[] = [];
+    const opts: Array<unknown> = [];
+    const onDone = (msg: string, opt: unknown) => {
+      messages.push(msg);
+      opts.push(opt);
+    };
+
+    const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
+
+    expect(result).toBeNull();
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('Ultrareview failed to launch');
     expect((opts[0] as { display: string }).display).toBe('system');
   });
 
-  test('blocked action with billing_note: shows billing_note as message', async () => {
-    mockAxiosPost.mockImplementationOnce(async () => ({
-      status: 200,
-      data: { action: 'blocked', billing_note: 'Ultrareview is unavailable for your organization.' },
-    }));
-
-    const messages: string[] = [];
-    const onDone = (msg: string) => messages.push(msg);
-
-    await call(onDone as Parameters<typeof call>[0], makeContext(), '');
-    expect(messages[0]).toBe('Ultrareview is unavailable for your organization.');
-  });
-
-  test('confirm action: returns UltrareviewPreflightDialog element', async () => {
-    mockAxiosPost.mockImplementationOnce(async () => ({
-      status: 200,
-      data: { action: 'confirm', billing_note: 'This run will cost ~$2.' },
-    }));
-
-    const onDone = (_msg: string) => {};
-    const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
-    // Should return a React element (the PreflightDialog)
-    expect(result).not.toBeNull();
-    expect(typeof result).toBe('object');
-    // The element type should be the PreflightDialog component
-    const element = result as { type: unknown };
-    expect(element.type).toBeDefined();
-  });
-
-  test('null preflight (network failure): falls back to direct launch', async () => {
-    mockAxiosPost.mockImplementationOnce(async () => {
-      throw new Error('network error');
-    });
-
-    const messages: string[] = [];
-    const onDone = (msg: string) => messages.push(msg);
-
-    const result = await call(onDone as Parameters<typeof call>[0], makeContext(), '');
-    expect(result).toBeNull();
-    expect(messages.length).toBe(1);
-    expect(messages[0]).toContain('Launched successfully');
-  });
-
-  test('PR number args: extracts pr_number for preflight request', async () => {
-    const capturedBodies: Array<unknown> = [];
-    mockAxiosPost.mockImplementationOnce(async (_url: unknown, body: unknown) => {
-      capturedBodies.push(body);
-      return { status: 200, data: { action: 'proceed', billing_note: null } };
-    });
+  test('proceed gate: forwards args (e.g. PR number) verbatim to launchRemoteReview', async () => {
+    _gateResult = { kind: 'proceed', billingNote: '' };
 
     const messages: string[] = [];
     const onDone = (msg: string) => messages.push(msg);
 
     await call(onDone as Parameters<typeof call>[0], makeContext(), '42');
 
-    expect(capturedBodies.length).toBe(1);
-    const b = capturedBodies[0] as { pr_number: number; repo: string };
-    expect(b.pr_number).toBe(42);
-    expect(b.repo).toBe('testowner/testrepo');
+    // ultrareviewCommand.call doesn't parse args itself — launchRemoteReview
+    // is responsible for PR-number detection. So we only assert pass-through.
+    expect(_capturedLaunchArgs).toEqual(['42']);
   });
 });
