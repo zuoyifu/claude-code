@@ -1,4 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach } from 'bun:test'
+import { isEnvTruthy } from '../../envUtils.js'
 
 const { getAPIProvider, isFirstPartyAnthropicBaseUrl } = await import(
   '../providers'
@@ -12,11 +13,12 @@ describe('getAPIProvider', () => {
     'CLAUDE_CODE_USE_FOUNDRY',
     'CLAUDE_CODE_USE_OPENAI',
     'CLAUDE_CODE_USE_GROK',
+    'OPENAI_BASE_URL',
+    'GEMINI_BASE_URL',
   ] as const
   const savedEnv: Record<string, string | undefined> = {}
 
   beforeEach(() => {
-    // Save and clear environment variables
     for (const key of envKeys) {
       savedEnv[key] = process.env[key]
       delete process.env[key]
@@ -24,7 +26,6 @@ describe('getAPIProvider', () => {
   })
 
   afterEach(() => {
-    // Restore environment variables
     for (const key of envKeys) {
       if (savedEnv[key] !== undefined) {
         process.env[key] = savedEnv[key]
@@ -67,6 +68,16 @@ describe('getAPIProvider', () => {
     expect(getAPIProvider({})).toBe('foundry')
   })
 
+  test('returns "openai" when CLAUDE_CODE_USE_OPENAI is set', () => {
+    process.env.CLAUDE_CODE_USE_OPENAI = '1'
+    expect(getAPIProvider({})).toBe('openai')
+  })
+
+  test('returns "grok" when CLAUDE_CODE_USE_GROK is set', () => {
+    process.env.CLAUDE_CODE_USE_GROK = '1'
+    expect(getAPIProvider({})).toBe('grok')
+  })
+
   test('bedrock takes precedence over gemini', () => {
     process.env.CLAUDE_CODE_USE_BEDROCK = '1'
     process.env.CLAUDE_CODE_USE_GEMINI = '1'
@@ -88,16 +99,19 @@ describe('getAPIProvider', () => {
 
   test('"true" is truthy', () => {
     process.env.CLAUDE_CODE_USE_BEDROCK = 'true'
+    expect(isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)).toBe(true)
     expect(getAPIProvider({})).toBe('bedrock')
   })
 
   test('"0" is not truthy', () => {
     process.env.CLAUDE_CODE_USE_BEDROCK = '0'
+    expect(isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)).toBe(false)
     expect(getAPIProvider({})).toBe('firstParty')
   })
 
   test('empty string is not truthy', () => {
     process.env.CLAUDE_CODE_USE_BEDROCK = ''
+    expect(isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)).toBe(false)
     expect(getAPIProvider({})).toBe('firstParty')
   })
 })
