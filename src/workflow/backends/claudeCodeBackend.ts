@@ -7,7 +7,7 @@ import {
   type AgentRunResult,
   WorkflowAbortedError,
 } from '@claude-code-best/workflow-engine'
-import { assembleToolPool } from '../../tools.js'
+import { assembleToolPool } from '../../tools/registry/assembler.js'
 import { finalizeAgentTool } from '@claude-code-best/builtin-tools/tools/AgentTool/agentToolUtils.js'
 import { runAgent } from '@claude-code-best/builtin-tools/tools/AgentTool/runAgent.js'
 import {
@@ -29,7 +29,7 @@ import {
 import { logEvent } from '../../services/analytics/index.js'
 import type { ModelAlias } from '../../utils/model/aliases.js'
 import type { Message } from '../../types/message.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import { readHostBundle } from '../hostHandle.js'
 
 /** Fallback definition for workflow subagents (used when agentType does not match a real registry entry). */

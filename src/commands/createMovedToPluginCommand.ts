@@ -1,6 +1,6 @@
 import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
 import type { Command } from '../commands.js'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '../tools/core/index.js'
 
 type Options = {
   name: string

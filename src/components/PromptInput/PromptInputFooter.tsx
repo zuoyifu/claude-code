@@ -12,7 +12,7 @@ import { Box, Text, useInput } from '@anthropic/ink';
 import type { MCPServerConnection } from '../../services/mcp/types.js';
 import { useRegisterOverlay } from '../../context/overlayContext.js';
 import { useAppState, useSetAppState } from '../../state/AppState.js';
-import type { ToolPermissionContext } from '../../Tool.js';
+import type { ToolPermissionContext } from '../../tools/core/index.js';
 import type { Message } from '../../types/message.js';
 import type { PromptInputMode, VimMode } from '../../types/textInputTypes.js';
 import type { AutoUpdaterResult } from '../../utils/autoUpdater.js';

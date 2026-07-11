@@ -3,7 +3,7 @@ import { Text } from '@anthropic/ink';
 import { extractMcpToolDisplayName, getMcpDisplayName } from '../../services/mcp/mcpStringUtils.js';
 import { filterToolsByServer } from '../../services/mcp/utils.js';
 import { useAppState } from '../../state/AppState.js';
-import type { Tool } from '../../Tool.js';
+import type { Tool } from '../../tools/core/index.js';
 import { plural } from '../../utils/stringUtils.js';
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js';
 import { Select } from '../CustomSelect/index.js';

@@ -1,4 +1,5 @@
-import { feature } from 'bun:bundle'
+// C2: feature() 边界化 —— TRANSCRIPT_CLASSIFIER 检查通过 feature-gate.ts 边界
+import { isTranscriptClassifierEnabled } from '../registry/feature-gate.js'
 import type {
   ContentBlockParam,
   ToolResultBlockParam,
@@ -34,7 +35,7 @@ import {
   type ToolProgress,
   type ToolProgressData,
   type ToolUseContext,
-} from '../../Tool.js'
+} from '../core/index.js'
 import type { BashToolInput } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js'
 import { startSpeculativeClassifierCheck } from '@claude-code-best/builtin-tools/tools/BashTool/bashPermissions.js'
 import { BASH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/BashTool/toolName.js'
@@ -48,9 +49,9 @@ import {
   isDeferredTool,
   SEARCH_EXTRA_TOOLS_TOOL_NAME,
 } from '@claude-code-best/builtin-tools/tools/SearchExtraToolsTool/prompt.js'
-import { getAllBaseTools } from '../../tools.js'
+import { getAllBaseTools } from '../registry/assembler.js'
 import type { HookProgress } from '../../types/hooks.js'
-import { recordToolObservation } from '../langfuse/index.js'
+import { recordToolObservation } from '../../services/langfuse/index.js'
 import type {
   AssistantMessage,
   AttachmentMessage,
@@ -115,22 +116,22 @@ import {
 import {
   McpAuthError,
   McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-} from '../mcp/client.js'
-import { mcpInfoFromString } from '../mcp/mcpStringUtils.js'
-import { normalizeNameForMCP } from '../mcp/normalization.js'
-import type { MCPServerConnection } from '../mcp/types.js'
+} from '../../services/mcp/client.js'
+import { mcpInfoFromString } from '../../services/mcp/mcpStringUtils.js'
+import { normalizeNameForMCP } from '../../services/mcp/normalization.js'
+import type { MCPServerConnection } from '../../services/mcp/types.js'
 import {
   getLoggingSafeMcpBaseUrl,
   getMcpServerScopeFromToolName,
   isMcpTool,
-} from '../mcp/utils.js'
+} from '../../services/mcp/utils.js'
 import {
   resolveHookPermissionDecision,
   runPostToolUseFailureHooks,
   runPostToolUseHooks,
   runPreToolUseHooks,
-} from './toolHooks.js'
-import { isSkillLearningEnabled } from '../skillLearning/featureCheck.js'
+} from './hooks.js'
+import { isSkillLearningEnabled } from '../../services/skillLearning/featureCheck.js'
 
 // Cached import promise for the skill-learning wrapper — paid once, not per call.
 let _skillLearningWrapperCache:
@@ -147,7 +148,7 @@ let _skillLearningWrapperCache:
 function getSkillLearningWrapper() {
   if (!_skillLearningWrapperCache) {
     _skillLearningWrapperCache = import(
-      '../skillLearning/toolEventObserver.js'
+      '../../services/skillLearning/toolEventObserver.js'
     ).catch(err => {
       // Clear the cache on rejection so the next tool call can retry the
       // import instead of reusing the same rejected promise forever (which
@@ -1115,7 +1116,7 @@ async function checkPermissionsAndCallTool(
     // Run PermissionDenied hooks for auto mode classifier denials.
     // If a hook returns {retry: true}, tell the model it may retry.
     if (
-      feature('TRANSCRIPT_CLASSIFIER') &&
+      isTranscriptClassifierEnabled() &&
       permissionDecision.decisionReason?.type === 'classifier' &&
       permissionDecision.decisionReason.classifier === 'auto-mode'
     ) {

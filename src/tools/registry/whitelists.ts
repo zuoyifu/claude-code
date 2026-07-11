@@ -1,5 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import { feature } from 'bun:bundle'
+// C2: feature() 边界化 —— WORKFLOW_SCRIPTS 检查通过 feature-gate.ts 边界
+import { isToolEnabled } from './feature-gate.js'
 import { TASK_OUTPUT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/TaskOutputTool/constants.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/ExitPlanModeTool/constants.js'
 import { ENTER_PLAN_MODE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/EnterPlanModeTool/constants.js'
@@ -12,7 +13,7 @@ import { TODO_WRITE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/Todo
 import { GREP_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/GrepTool/prompt.js'
 import { WEB_FETCH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/WebFetchTool/prompt.js'
 import { GLOB_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/GlobTool/prompt.js'
-import { SHELL_TOOL_NAMES } from '../utils/shell/shellToolUtils.js'
+import { SHELL_TOOL_NAMES } from '../../utils/shell/shellToolUtils.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileEditTool/constants.js'
 import { FILE_WRITE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileWriteTool/prompt.js'
 import { NOTEBOOK_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/NotebookEditTool/constants.js'
@@ -50,7 +51,7 @@ export const ALL_AGENT_DISALLOWED_TOOLS = new Set([
   ASK_USER_QUESTION_TOOL_NAME,
   TASK_STOP_TOOL_NAME,
   // Prevent recursive workflow execution inside subagents.
-  ...(feature('WORKFLOW_SCRIPTS') ? [WORKFLOW_TOOL_NAME] : []),
+  ...(isToolEnabled('WORKFLOW_SCRIPTS') ? [WORKFLOW_TOOL_NAME] : []),
   // LOCAL-WIRING PR-1: keep local-memory recall on the main thread only.
   // Cross-session user notes shouldn't be siphoned by spawned subagents.
   // Layer 2 of the gate (fork path useExactTools) is enforced separately
@@ -168,7 +169,7 @@ export const CORE_TOOLS = new Set([
   // Workflow orchestration — first-class primitive /ultracode directs the
   // model to call directly. Kept core (not deferred) so it's always visible
   // and callable without a SearchExtraTools round-trip. Registration itself
-  // is still feature-gated (feature('WORKFLOW_SCRIPTS')) in tools.ts.
+  // is still feature-gated (feature('WORKFLOW_SCRIPTS')) in registry/feature-gate.ts.
   WORKFLOW_TOOL_NAME, // 'Workflow'
   // Scheduling & monitoring
   SLEEP_TOOL_NAME, // 'Sleep'

@@ -1,4 +1,4 @@
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import type {
   LocalJSXCommandContext,
   LocalJSXCommandOnDone,

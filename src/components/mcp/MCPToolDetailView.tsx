@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text } from '@anthropic/ink';
 import { extractMcpToolDisplayName, getMcpDisplayName } from '../../services/mcp/mcpStringUtils.js';
-import type { Tool } from '../../Tool.js';
+import type { Tool } from '../../tools/core/index.js';
 import { ConfigurableShortcutHint } from '../ConfigurableShortcutHint.js';
 import { Dialog } from '@anthropic/ink';
 import type { ServerInfo } from './types.js';

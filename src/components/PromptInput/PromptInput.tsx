@@ -44,7 +44,7 @@ import { abortPromptSuggestion, logSuggestionSuppressed } from '../../services/P
 import { type ActiveSpeculationState, abortSpeculation } from '../../services/PromptSuggestion/speculation.js';
 import { getActiveAgentForInput, getViewedTeammateTask } from '../../state/selectors.js';
 import { enterTeammateView, exitTeammateView, stopOrDismissAgent } from '../../state/teammateViewHelpers.js';
-import type { ToolPermissionContext } from '../../Tool.js';
+import type { ToolPermissionContext } from '../../tools/core/index.js';
 import { getRunningTeammatesSorted } from '../../tasks/InProcessTeammateTask/InProcessTeammateTask.js';
 import type { InProcessTeammateTaskState } from '../../tasks/InProcessTeammateTask/types.js';
 import { isPanelAgentTask, type LocalAgentTaskState } from '../../tasks/LocalAgentTask/LocalAgentTask.js';

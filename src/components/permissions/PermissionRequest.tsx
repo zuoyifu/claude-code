@@ -4,7 +4,7 @@ import { EnterPlanModeTool } from '@claude-code-best/builtin-tools/tools/EnterPl
 import { ExitPlanModeV2Tool } from '@claude-code-best/builtin-tools/tools/ExitPlanModeTool/ExitPlanModeV2Tool.js';
 import { useNotifyAfterTimeout } from '../../hooks/useNotifyAfterTimeout.js';
 import { useKeybinding } from '../../keybindings/useKeybinding.js';
-import type { AnyObject, Tool, ToolUseContext } from '../../Tool.js';
+import type { AnyObject, Tool, ToolUseContext } from '../../tools/core/index.js';
 import { AskUserQuestionTool } from '@claude-code-best/builtin-tools/tools/AskUserQuestionTool/AskUserQuestionTool.js';
 import { BashTool } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js';
 import { FileEditTool } from '@claude-code-best/builtin-tools/tools/FileEditTool/FileEditTool.js';

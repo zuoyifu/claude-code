@@ -11,7 +11,7 @@ import { getIsRemoteMode } from '../../bootstrap/state.js'
 import { getSystemPrompt } from '../../constants/prompts.js'
 import { getSystemContext, getUserContext } from '../../context.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
+import type { Tool, ToolUseContext } from '../../tools/core/index.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileEditTool/constants.js'
 import {
   FileReadTool,

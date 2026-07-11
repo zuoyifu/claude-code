@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { parseToolPreset, filterToolsByDenyRules } from '../tools'
-import { getEmptyToolPermissionContext } from '../Tool'
+import {
+  parseToolPreset,
+  filterToolsByDenyRules,
+} from '../tools/registry/assembler.js'
+import { getEmptyToolPermissionContext } from '../tools/core/index.js'
 
 describe('parseToolPreset', () => {
   test('returns "default" for "default" input', () => {

@@ -1,4 +1,4 @@
-import type { Tools } from '../../Tool.js'
+import type { Tools } from '../../tools/core/index.js'
 import { resolveAgentTools } from '@claude-code-best/builtin-tools/tools/AgentTool/agentToolUtils.js'
 import type {
   AgentDefinition,

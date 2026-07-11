@@ -3,7 +3,7 @@ import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs
 import * as React from 'react';
 import { BULLET_OPERATOR } from '../../../constants/figures.js';
 import { Text } from '@anthropic/ink';
-import { filterToolProgressMessages, type Tool, type Tools } from '../../../Tool.js';
+import { filterToolProgressMessages, type Tool, type Tools } from '../../../tools/core/index.js';
 import type { ProgressMessage } from '../../../types/message.js';
 import {
   INTERRUPT_MESSAGE_FOR_TOOL_USE,

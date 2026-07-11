@@ -7,7 +7,7 @@ import {
   setProjectRoot,
 } from '../bootstrap/state'
 import { query } from '../query'
-import { getEmptyToolPermissionContext } from '../Tool'
+import { getEmptyToolPermissionContext } from '../tools/core/index.js'
 import type { AssistantMessage } from '../types/message'
 import { asSystemPrompt } from '../utils/systemPromptType'
 import {

@@ -3,7 +3,7 @@ import type {
   ContentBlockParam,
   ToolResultBlockParam,
 } from '@anthropic-ai/sdk/resources/messages/messages.mjs'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '../tools/core/index.js'
 import type {
   GroupedToolUseMessage,
   NormalizedAssistantMessage,

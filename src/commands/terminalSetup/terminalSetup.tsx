@@ -8,7 +8,7 @@ import { pathToFileURL } from 'url';
 import { supportsHyperlinks } from '@anthropic/ink';
 import { color } from '@anthropic/ink';
 import { maybeMarkProjectOnboardingComplete } from '../../projectOnboardingState.js';
-import type { ToolUseContext } from '../../Tool.js';
+import type { ToolUseContext } from '../../tools/core/index.js';
 import type { LocalJSXCommandContext, LocalJSXCommandOnDone } from '../../types/command.js';
 import {
   backupTerminalPreferences,

@@ -1,5 +1,5 @@
 import type { LocalCommandResult } from '../../commands.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 
 export async function call(
   _args: string,

@@ -6,7 +6,7 @@
  * The coordinator can only use Agent, SendMessage, and TaskStop.
  */
 import { feature } from 'bun:bundle'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '../tools/core/index.js'
 import type {
   Command,
   LocalJSXCommandContext,

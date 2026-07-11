@@ -15,8 +15,8 @@ import type {
   ToolResult,
   ToolUseContext,
   ValidationResult,
-} from 'src/Tool.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+} from 'src/tools/core/index.js'
+import { buildTool, type ToolDef } from 'src/tools/core/index.js'
 import type { Command } from 'src/types/command.js'
 import type {
   AssistantMessage,

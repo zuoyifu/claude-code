@@ -12,7 +12,7 @@ import type {
   UserMessage,
 } from '../../../types/message.js'
 import type { AgentId } from '../../../types/ids.js'
-import type { Tools } from '../../../Tool.js'
+import type { Tools } from '../../../tools/core/index.js'
 import { getOpenAIClient } from './client.js'
 import { updateOpenAIUsage } from './openaiShared.js'
 import {
@@ -34,7 +34,7 @@ import { toolToAPISchema } from '../../../utils/api.js'
 import {
   getEmptyToolPermissionContext,
   toolMatchesName,
-} from '../../../Tool.js'
+} from '../../../tools/core/index.js'
 import { logForDebugging } from '../../../utils/debug.js'
 import { addToTotalSessionCost } from '../../../cost-tracker.js'
 import { calculateUSDCost } from '../../../utils/modelCost.js'

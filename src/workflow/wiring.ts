@@ -4,7 +4,7 @@ import {
   WORKFLOW_TOOL_NAME,
   type WorkflowToolDescriptor,
 } from '@claude-code-best/workflow-engine'
-import { buildTool, type Tool } from '../Tool.js'
+import { buildTool, type Tool } from '../tools/core/index.js'
 import { getWorkflowService } from './service.js'
 
 /**

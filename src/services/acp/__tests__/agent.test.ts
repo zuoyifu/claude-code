@@ -54,11 +54,11 @@ mockModulePreservingExports('../../../QueryEngine.ts', {
   },
 })
 
-mockModulePreservingExports('../../../tools.ts', {
+mockModulePreservingExports('../../../tools/registry/assembler.ts', {
   getTools: mock(() => []),
 })
 
-mockModulePreservingExports('../../../Tool.ts', {
+mockModulePreservingExports('../../../tools/core/index.ts', {
   toolMatchesName: mock(() => false),
   findToolByName: mock(() => undefined),
   filterToolProgressMessages: mock(() => []),

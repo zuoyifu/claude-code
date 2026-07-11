@@ -37,7 +37,11 @@ import { query } from './query.js'
 import { categorizeRetryableAPIError } from './services/api/errors.js'
 import type { MCPServerConnection } from './services/mcp/types.js'
 import type { AppState } from './state/AppState.js'
-import { type Tools, type ToolUseContext, toolMatchesName } from './Tool.js'
+import {
+  type Tools,
+  type ToolUseContext,
+  toolMatchesName,
+} from './tools/core/index.js'
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import type { APIError } from '@anthropic-ai/sdk'

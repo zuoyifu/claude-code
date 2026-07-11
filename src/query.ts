@@ -27,7 +27,7 @@ import {
 } from 'src/services/analytics/index.js'
 import { ImageSizeError } from './utils/imageValidation.js'
 import { ImageResizeError } from './utils/imageResizer.js'
-import { findToolByName, type ToolUseContext } from './Tool.js'
+import { findToolByName, type ToolUseContext } from './tools/core/index.js'
 import { asSystemPrompt, type SystemPrompt } from './utils/systemPromptType.js'
 import type {
   AssistantMessage,
@@ -69,7 +69,7 @@ const skillPrefetch = feature('EXPERIMENTAL_SKILL_SEARCH')
   ? (require('./services/skillSearch/prefetch.js') as typeof import('./services/skillSearch/prefetch.js'))
   : null
 const searchExtraToolsPrefetch = feature('EXPERIMENTAL_SEARCH_EXTRA_TOOLS')
-  ? (require('./services/searchExtraTools/prefetch.js') as typeof import('./services/searchExtraTools/prefetch.js'))
+  ? (require('./tools/discovery/prefetch.js') as typeof import('./tools/discovery/prefetch.js'))
   : null
 const _jobClassifier = feature('TEMPLATES')
   ? (require('./jobs/classifier.js') as typeof import('./jobs/classifier.js'))
@@ -105,9 +105,9 @@ import { executeStopFailureHooks } from './utils/hooks.js'
 import type { QuerySource } from './constants/querySource.js'
 import type { QueuedCommand } from './types/textInputTypes.js'
 import { createDumpPromptsFetch } from './services/api/dumpPrompts.js'
-import { StreamingToolExecutor } from './services/tools/StreamingToolExecutor.js'
+import { StreamingToolExecutor } from './tools/execution/streaming-executor.js'
 import { queryCheckpoint } from './utils/queryProfiler.js'
-import { runTools } from './services/tools/toolOrchestration.js'
+import { runTools } from './tools/execution/orchestrator.js'
 import { applyToolResultBudget } from './utils/toolResultStorage.js'
 import { recordContentReplacement } from './utils/sessionStorage.js'
 import { handleStopHooks } from './query/stopHooks.js'

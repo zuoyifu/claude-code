@@ -17,7 +17,7 @@ import {
 } from '../services/analytics/index.js';
 import type { MCPServerConnection, ScopedMcpServerConfig } from '../services/mcp/types.js';
 import { useAppState, useSetAppState } from '../state/AppState.js';
-import type { Tool } from '../Tool.js';
+import type { Tool } from '../tools/core/index.js';
 import type { AgentColorName } from '@claude-code-best/builtin-tools/tools/AgentTool/agentColorManager.js';
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { asSessionId } from '../types/ids.js';

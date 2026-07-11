@@ -15,8 +15,8 @@ import { abortSpeculation } from '../../services/PromptSuggestion/speculation.js
 import type { AppState } from '../../state/AppState.js';
 import type { SetAppState, Task, TaskStateBase } from '../../Task.js';
 import { createTaskStateBase } from '../../Task.js';
-import type { Tools } from '../../Tool.js';
-import { findToolByName } from '../../Tool.js';
+import type { Tools } from '../../tools/core/index.js';
+import { findToolByName } from '../../tools/core/index.js';
 import type { AgentToolResult } from '@claude-code-best/builtin-tools/tools/AgentTool/agentToolUtils.js';
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js';

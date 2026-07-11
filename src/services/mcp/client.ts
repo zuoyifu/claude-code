@@ -49,7 +49,7 @@ import {
   type Tool,
   type ToolCallProgress,
   toolMatchesName,
-} from '../../Tool.js'
+} from '../../tools/core/index.js'
 import { ListMcpResourcesTool } from '@claude-code-best/builtin-tools/tools/ListMcpResourcesTool/ListMcpResourcesTool.js'
 import {
   type MCPProgress,

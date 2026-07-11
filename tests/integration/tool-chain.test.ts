@@ -1,10 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { getAllBaseTools, parseToolPreset, getTools } from '../../src/tools.ts'
+import {
+  getAllBaseTools,
+  parseToolPreset,
+  getTools,
+} from '../../src/tools/registry/assembler.js'
 import {
   findToolByName,
   getEmptyToolPermissionContext,
   buildTool,
-} from '../../src/Tool.ts'
+} from '../../src/tools/core/index.js'
 
 // ─── Tool Registration & Discovery ──────────────────────────────────────
 

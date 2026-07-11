@@ -33,7 +33,7 @@ const {
   subscribeToSearchExtraToolsPrefetch,
   getSearchExtraToolsPrefetchSnapshot,
   clearSearchExtraToolsPrefetchResults,
-} = await import('src/services/searchExtraTools/prefetch.js')
+} = await import('src/tools/discovery/prefetch.js')
 
 const { useSearchExtraToolsHint } = await import(
   'src/hooks/useSearchExtraToolsHint.js'

@@ -5,7 +5,7 @@ import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js';
 import { useTerminalSize } from 'src/hooks/useTerminalSize.js';
 import { useAppState, useSetAppState } from 'src/state/AppState.js';
 import { enterTeammateView, exitTeammateView } from 'src/state/teammateViewHelpers.js';
-import type { ToolUseContext } from 'src/Tool.js';
+import type { ToolUseContext } from 'src/tools/core/index.js';
 import { DreamTask, type DreamTaskState } from 'src/tasks/DreamTask/DreamTask.js';
 import { InProcessTeammateTask } from 'src/tasks/InProcessTeammateTask/InProcessTeammateTask.js';
 import type { InProcessTeammateTaskState } from 'src/tasks/InProcessTeammateTask/types.js';

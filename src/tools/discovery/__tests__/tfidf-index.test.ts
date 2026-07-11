@@ -33,7 +33,7 @@ const {
   searchTools,
   getToolIndex,
   clearToolIndexCache,
-} = await import('../toolIndex.js')
+} = await import('../tfidf-index.js')
 
 type MockTool = {
   name: string
@@ -95,7 +95,7 @@ describe('buildToolIndex', () => {
         searchHint: 'schedule recurring prompt',
         prompt: async () => 'Create cron jobs for scheduling.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const index = await buildToolIndex(tools)
     // Only non-core, non-alwaysLoad tools should be indexed
@@ -110,7 +110,7 @@ describe('buildToolIndex', () => {
     const tools = [
       makeMockTool({ name: 'Read', alwaysLoad: true }),
       makeMockTool({ name: 'Edit', alwaysLoad: true }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const index = await buildToolIndex(tools)
     expect(index.length).toBe(0)
@@ -130,7 +130,7 @@ describe('searchTools', () => {
         searchHint: 'configure settings options',
         prompt: async () => 'Manage configuration settings.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const index = await buildToolIndex(tools)
     const results = searchTools('schedule cron job', index)
@@ -146,7 +146,7 @@ describe('searchTools', () => {
         name: 'ConfigTool',
         prompt: async () => 'Manage configuration.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const index = await buildToolIndex(tools)
     expect(searchTools('', index)).toEqual([])
@@ -158,7 +158,7 @@ describe('searchTools', () => {
         name: 'ConfigTool',
         prompt: async () => 'Manage configuration settings.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const index = await buildToolIndex(tools)
     const results = searchTools('quantum physics entanglement', index)
@@ -167,7 +167,9 @@ describe('searchTools', () => {
 
   test('CJK tokenization produces bigrams', async () => {
     // Verify CJK text is tokenized into bigrams (delegated to localSearch.tokenize)
-    const { tokenizeAndStem } = await import('../../skillSearch/localSearch.js')
+    const { tokenizeAndStem } = await import(
+      '../../../services/skillSearch/localSearch.js'
+    )
     const tokens = tokenizeAndStem('搜索代码')
     expect(tokens).toContain('搜索')
     expect(tokens).toContain('代码')
@@ -185,7 +187,7 @@ describe('getToolIndex caching', () => {
         name: 'ConfigTool',
         prompt: async () => 'Manage configuration.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const first = await getToolIndex(tools)
     const second = await getToolIndex(tools)
@@ -198,7 +200,7 @@ describe('getToolIndex caching', () => {
         name: 'ConfigTool',
         prompt: async () => 'Manage configuration.',
       }),
-    ] as unknown as import('../../../Tool.js').Tool[]
+    ] as unknown as import('../../core/index.js').Tool[]
 
     const first = await getToolIndex(tools)
     clearToolIndexCache()

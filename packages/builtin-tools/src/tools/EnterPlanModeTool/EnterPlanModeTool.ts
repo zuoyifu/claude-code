@@ -4,8 +4,8 @@ import {
   getAllowedChannels,
   handlePlanModeTransition,
 } from 'src/bootstrap/state.js'
-import type { Tool } from 'src/Tool.js'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import type { Tool } from 'src/tools/core/index.js'
+import { buildTool, type ToolDef } from 'src/tools/core/index.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { applyPermissionUpdate } from 'src/utils/permissions/PermissionUpdate.js'
 import { prepareContextForPlanMode } from 'src/utils/permissions/permissionSetup.js'

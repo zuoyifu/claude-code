@@ -6,7 +6,7 @@
  * See docs/magic-docs.md for more information.
  */
 
-import type { Tool, ToolUseContext } from '../../Tool.js'
+import type { Tool, ToolUseContext } from '../../tools/core/index.js'
 import type { BuiltInAgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js'
 import { runAgent } from '@claude-code-best/builtin-tools/tools/AgentTool/runAgent.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileEditTool/constants.js'

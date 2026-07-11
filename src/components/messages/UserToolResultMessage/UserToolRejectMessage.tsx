@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useTerminalSize } from '../../../hooks/useTerminalSize.js';
 import { useTheme } from '@anthropic/ink';
-import { filterToolProgressMessages, type Tool, type Tools } from '../../../Tool.js';
+import { filterToolProgressMessages, type Tool, type Tools } from '../../../tools/core/index.js';
 import type { ProgressMessage } from '../../../types/message.js';
 import type { buildMessageLookups } from '../../../utils/messages.js';
 import { FallbackToolUseRejectedMessage } from '../../FallbackToolUseRejectedMessage.js';

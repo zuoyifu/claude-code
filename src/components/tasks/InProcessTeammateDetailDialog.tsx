@@ -3,9 +3,9 @@ import type { DeepImmutable } from 'src/types/utils.js';
 import { useElapsedTime } from '../../hooks/useElapsedTime.js';
 import { type KeyboardEvent, Box, Text, useTheme } from '@anthropic/ink';
 import { useKeybindings } from '../../keybindings/useKeybinding.js';
-import { getEmptyToolPermissionContext } from '../../Tool.js';
+import { getEmptyToolPermissionContext } from '../../tools/core/index.js';
 import type { InProcessTeammateTaskState } from '../../tasks/InProcessTeammateTask/types.js';
-import { getTools } from '../../tools.js';
+import { getTools } from '../../tools/registry/assembler.js';
 import { formatNumber, truncateToWidth } from '../../utils/format.js';
 
 import { Byline, Dialog, KeyboardShortcutHint } from '@anthropic/ink';

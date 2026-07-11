@@ -17,7 +17,7 @@ import {
 } from '../../services/analytics/index.js'
 import { fetchUltrareviewQuota } from '../../services/api/ultrareviewQuota.js'
 import { fetchUtilization } from '../../services/api/usage.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import {
   checkRemoteAgentEligibility,
   formatPreconditionError,

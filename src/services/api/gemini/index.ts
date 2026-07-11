@@ -9,7 +9,7 @@ import type {
   StreamEvent,
   SystemAPIErrorMessage,
 } from '../../../types/message.js'
-import { type Tools } from '../../../Tool.js'
+import { type Tools } from '../../../tools/core/index.js'
 import { toolToAPISchema } from '../../../utils/api.js'
 import { logForDebugging } from '../../../utils/debug.js'
 import {

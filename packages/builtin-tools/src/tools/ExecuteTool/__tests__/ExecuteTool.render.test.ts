@@ -43,7 +43,7 @@ mock.module('src/utils/searchExtraTools.js', () => ({
   getDeferredToolsDelta: () => null,
 }))
 
-mock.module('src/constants/tools.js', () => ({
+mock.module('src/tools/registry/whitelists.js', () => ({
   CORE_TOOLS: new Set(['ExecuteExtraTool', 'SearchExtraTools']),
 }))
 

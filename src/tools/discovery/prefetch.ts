@@ -1,13 +1,13 @@
 import type { Attachment } from '../../utils/attachments.js'
 import type { Message } from '../../types/message.js'
-import type { Tools } from '../../Tool.js'
+import type { Tools } from '../core/index.js'
 import {
   getToolIndex,
   searchTools,
   type SearchExtraToolsResult,
-} from './toolIndex.js'
+} from './tfidf-index.js'
 import { logForDebugging } from '../../utils/debug.js'
-import { extractQueryFromMessages } from '../skillSearch/prefetch.js'
+import { extractQueryFromMessages } from '../../services/skillSearch/prefetch.js'
 
 export type ToolDiscoveryResult = {
   name: string

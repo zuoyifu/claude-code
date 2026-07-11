@@ -4,7 +4,7 @@ import * as React from 'react';
 import { SentryErrorBoundary } from 'src/components/SentryErrorBoundary.js';
 import { Box, Text, useTheme } from '@anthropic/ink';
 import { useAppState } from '../../../state/AppState.js';
-import { filterToolProgressMessages, type Tool, type Tools } from '../../../Tool.js';
+import { filterToolProgressMessages, type Tool, type Tools } from '../../../tools/core/index.js';
 import type { NormalizedUserMessage, ProgressMessage } from '../../../types/message.js';
 import {
   deleteClassifierApproval,

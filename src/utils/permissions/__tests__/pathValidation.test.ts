@@ -21,7 +21,9 @@ mock.module('bun:bundle', () => ({
 }
 
 const { validatePath } = await import('../pathValidation.js')
-const { getEmptyToolPermissionContext } = await import('../../../Tool.js')
+const { getEmptyToolPermissionContext } = await import(
+  '../../../tools/core/index.js'
+)
 
 function makeContext(): ReturnType<typeof getEmptyToolPermissionContext> {
   return getEmptyToolPermissionContext()

@@ -5,7 +5,7 @@ import { Dialog } from '@anthropic/ink';
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js';
 import { logEvent } from '../../services/analytics/index.js';
 import { useClaudeAiLimits } from '../../services/claudeAiLimitsHook.js';
-import type { ToolUseContext } from '../../Tool.js';
+import type { ToolUseContext } from '../../tools/core/index.js';
 import type { LocalJSXCommandOnDone } from '../../types/command.js';
 import { getOauthAccountInfo, getRateLimitTier, getSubscriptionType } from '../../utils/auth.js';
 import { hasClaudeAiBillingAccess } from '../../utils/billing.js';

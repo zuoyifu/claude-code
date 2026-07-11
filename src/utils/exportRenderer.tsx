@@ -5,7 +5,7 @@ import { KeybindingProvider } from '../keybindings/KeybindingContext.js';
 import { loadKeybindingsSyncWithWarnings } from '../keybindings/loadUserBindings.js';
 import type { KeybindingContextName } from '../keybindings/types.js';
 import { AppStateProvider } from '../state/AppState.js';
-import type { Tools } from '../Tool.js';
+import type { Tools } from '../tools/core/index.js';
 import type { Message } from '../types/message.js';
 import { renderToAnsiString } from './staticRender.js';
 

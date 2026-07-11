@@ -1,10 +1,13 @@
 import type { ToolUseBlock } from '@anthropic-ai/sdk/resources/index.mjs'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import { findToolByName, type ToolUseContext } from '../../Tool.js'
+import { findToolByName, type ToolUseContext } from '../core/index.js'
 import type { AssistantMessage, Message } from '../../types/message.js'
 import { all } from '../../utils/generators.js'
-import { type MessageUpdateLazy, runToolUse } from './toolExecution.js'
-import { createToolBatchSpan, endToolBatchSpan } from '../langfuse/index.js'
+import { type MessageUpdateLazy, runToolUse } from './run-tool-use.js'
+import {
+  createToolBatchSpan,
+  endToolBatchSpan,
+} from '../../services/langfuse/index.js'
 
 function getMaxToolUseConcurrency(): number {
   return (

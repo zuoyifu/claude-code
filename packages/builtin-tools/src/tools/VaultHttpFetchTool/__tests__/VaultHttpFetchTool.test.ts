@@ -607,7 +607,7 @@ describe('AC18: VaultHttpFetch is in ALL_AGENT_DISALLOWED_TOOLS', () => {
   test('subagent gate layer 1 registration is wired', async () => {
     const fs = await import('node:fs')
     const path = await import('node:path')
-    const file = path.resolve('src/constants/tools.ts')
+    const file = path.resolve('src/tools/registry/whitelists.ts')
     const src = fs.readFileSync(file, 'utf8')
     // (a) constant is imported
     expect(src).toContain('VAULT_HTTP_FETCH_TOOL_NAME')

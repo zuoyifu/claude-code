@@ -1,5 +1,5 @@
 import { getSessionId } from '../../../bootstrap/state.js'
-import type { ToolUseContext } from '../../../Tool.js'
+import type { ToolUseContext } from '../../../tools/core/index.js'
 import { formatAgentId, parseAgentId } from '../../../utils/agentId.js'
 import { quote } from '../../../utils/bash/shellQuote.js'
 import { isInBundledMode } from '../../../utils/bundledMode.js'

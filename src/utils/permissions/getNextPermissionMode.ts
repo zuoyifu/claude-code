@@ -1,4 +1,4 @@
-import type { ToolPermissionContext } from '../../Tool.js'
+import type { ToolPermissionContext } from '../../tools/core/index.js'
 import type { PermissionMode } from './PermissionMode.js'
 import { transitionPermissionMode } from './permissionSetup.js'
 

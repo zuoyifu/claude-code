@@ -1,6 +1,6 @@
 import type { Command } from '../../../commands.js';
 import type { MCPServerConnection, ServerResource } from '../../../services/mcp/types.js';
-import type { Tool } from '../../../Tool.js';
+import type { Tool } from '../../../tools/core/index.js';
 
 export interface ReconnectResult {
   message: string;

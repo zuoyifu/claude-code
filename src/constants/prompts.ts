@@ -17,7 +17,7 @@ import { FILE_READ_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileR
 import { FILE_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileEditTool/constants.js'
 import { TODO_WRITE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/TodoWriteTool/constants.js'
 import { TASK_CREATE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/TaskCreateTool/constants.js'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '../tools/core/index.js'
 import type { Command } from '../types/command.js'
 import { BASH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/BashTool/toolName.js'
 import {

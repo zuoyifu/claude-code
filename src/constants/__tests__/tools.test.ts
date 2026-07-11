@@ -28,7 +28,7 @@ mock.module('src/services/analytics/growthbook.js', () => ({
   stopPeriodicGrowthBookRefresh: () => {},
 }))
 
-const { CORE_TOOLS } = await import('../tools.js')
+const { CORE_TOOLS } = await import('../../tools/registry/whitelists.js')
 const { isDeferredTool } = await import(
   '@claude-code-best/builtin-tools/tools/SearchExtraToolsTool/prompt.js'
 )

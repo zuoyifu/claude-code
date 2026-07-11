@@ -1,6 +1,6 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
-import type { Tool } from 'src/Tool.js'
-import { CORE_TOOLS } from 'src/constants/tools.js'
+import type { Tool } from 'src/tools/core/index.js'
+import { CORE_TOOLS } from 'src/tools/registry/whitelists.js'
 
 export { SEARCH_EXTRA_TOOLS_TOOL_NAME } from './constants.js'
 

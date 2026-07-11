@@ -5,7 +5,7 @@ import {
 import { sanitizeToolNameForAnalytics } from 'src/services/analytics/metadata.js'
 import type z from 'zod/v4'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { AnyObject, Tool, ToolUseContext } from '../../Tool.js'
+import type { AnyObject, Tool, ToolUseContext } from '../core/index.js'
 import type { HookProgress } from '../../types/hooks.js'
 import type {
   AssistantMessage,
@@ -29,8 +29,8 @@ import {
 } from '../../utils/permissions/PermissionResult.js'
 import { checkRuleBasedPermissions } from '../../utils/permissions/permissions.js'
 import { formatError } from '../../utils/toolErrors.js'
-import { isMcpTool } from '../mcp/utils.js'
-import type { McpServerType, MessageUpdateLazy } from './toolExecution.js'
+import { isMcpTool } from '../../services/mcp/utils.js'
+import type { McpServerType, MessageUpdateLazy } from './run-tool-use.js'
 
 export type PostToolUseHooksResult<Output> =
   | MessageUpdateLazy<AttachmentMessage | ProgressMessage<HookProgress>>

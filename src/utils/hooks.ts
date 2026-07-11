@@ -145,7 +145,11 @@ import {
 } from './hooks/hookEvents.js'
 import { createAttachmentMessage } from './attachments.js'
 import { all } from './generators.js'
-import { findToolByName, type Tools, type ToolUseContext } from '../Tool.js'
+import {
+  findToolByName,
+  type Tools,
+  type ToolUseContext,
+} from '../tools/core/index.js'
 import { execPromptHook } from './hooks/execPromptHook.js'
 import type { Message, AssistantMessage } from '../types/message.js'
 import { execAgentHook } from './hooks/execAgentHook.js'

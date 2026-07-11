@@ -11,7 +11,7 @@ import { useRegisterOverlay } from '../../context/overlayContext.js';
 import { Box, Text } from '@anthropic/ink';
 import { useKeybindings } from '../../keybindings/useKeybinding.js';
 import { buildCliLaunch, spawnCli } from '../../utils/cliLaunch.js';
-import type { ToolUseContext } from '../../Tool.js';
+import type { ToolUseContext } from '../../tools/core/index.js';
 import type { LocalJSXCommandContext, LocalJSXCommandOnDone } from '../../types/command.js';
 import { errorMessage } from '../../utils/errors.js';
 

@@ -28,7 +28,7 @@ import {
 import * as React from 'react';
 import { getSessionId } from '../../bootstrap/state.js';
 import { ComputerUseApproval } from '../../components/permissions/ComputerUseApproval/ComputerUseApproval.js';
-import type { Tool, ToolUseContext } from '../../Tool.js';
+import type { Tool, ToolUseContext } from '../../tools/core/index.js';
 import { logForDebugging } from '../debug.js';
 import { detectImageFormatFromBase64 } from '../imageResizer.js';
 import { checkComputerUseLock, tryAcquireComputerUseLock } from './computerUseLock.js';

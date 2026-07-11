@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { filterParentToolsForFork } from '../agentToolFilter.js'
-import { ALL_AGENT_DISALLOWED_TOOLS } from '../../constants/tools.js'
-import type { Tool } from '../../Tool.js'
+import { ALL_AGENT_DISALLOWED_TOOLS } from '../../tools/registry/whitelists.js'
+import type { Tool } from '../../tools/core/index.js'
 
 // L6 fix: synthetic tool factory typed precisely. filterParentToolsForFork
 // only reads .name; if the filter ever needed more (e.g. .isEnabled()),

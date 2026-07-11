@@ -1,11 +1,11 @@
-import type { Tools } from '../../Tool.js'
+import type { Tools } from '../core/index.js'
 import { logForDebugging } from '../../utils/debug.js'
 import {
   tokenizeAndStem,
   computeWeightedTf,
   computeIdf,
   cosineSimilarity,
-} from '../skillSearch/localSearch.js'
+} from '../../services/skillSearch/localSearch.js'
 import { isDeferredTool } from '@claude-code-best/builtin-tools/tools/SearchExtraToolsTool/prompt.js'
 
 export interface ToolIndexEntry {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { StreamingToolExecutor } from '../StreamingToolExecutor.js'
-import type { ToolUseContext } from '../../../Tool.js'
+import { StreamingToolExecutor } from '../streaming-executor.js'
+import type { ToolUseContext } from '../../core/index.js'
 
 function makeMinimalContext(): ToolUseContext {
   const abortController = new AbortController()

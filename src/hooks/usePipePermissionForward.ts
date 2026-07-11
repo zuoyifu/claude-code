@@ -8,7 +8,7 @@
  */
 import { feature } from 'bun:bundle'
 import { useEffect } from 'react'
-import type { Tool, ToolUseContext } from '../Tool.js'
+import type { Tool, ToolUseContext } from '../tools/core/index.js'
 import type { MessageType } from '../types/message.js'
 
 type Deps = {

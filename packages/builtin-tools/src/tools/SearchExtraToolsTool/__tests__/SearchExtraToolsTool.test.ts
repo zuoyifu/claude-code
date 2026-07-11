@@ -40,7 +40,7 @@ mock.module('src/utils/searchExtraTools.js', () => ({
   getDeferredToolsDelta: () => null,
 }))
 
-mock.module('src/constants/tools.js', () => ({
+mock.module('src/tools/registry/whitelists.js', () => ({
   CORE_TOOLS: new Set(['Read', 'Edit', 'SearchExtraTools', 'ExecuteExtraTool']),
 }))
 
@@ -63,7 +63,7 @@ const mockSearchTools = mock(
 )
 const mockGetToolIndex = mock(async (_tools: unknown) => [])
 
-mock.module('src/services/searchExtraTools/toolIndex.js', () => ({
+mock.module('src/tools/discovery/tfidf-index.js', () => ({
   getToolIndex: mockGetToolIndex,
   searchTools: mockSearchTools,
 }))

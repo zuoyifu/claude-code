@@ -63,6 +63,55 @@ function _factory() {
       return null // 默认返回 null，测试可按需覆盖
     },
 
+    loadFeatureGatedToolSync: (flag: FeatureGatedToolFlag): unknown => {
+      if (!state.enabledFlags.has(flag)) return null
+      const custom = state.customLoaders[flag]
+      if (custom) {
+        // custom loader 是 async 的；mock 环境下同步返回不可能等待。
+        // 测试如需验证 sync loader，请用 registerLoader 注册 sync factory。
+        // 这里直接调用 custom() 并忽略返回的 Promise（测试默认 null）。
+        return null
+      }
+      return null
+    },
+
+    loadSleepToolSync: (): unknown => {
+      if (
+        !state.enabledFlags.has('PROACTIVE') &&
+        !state.enabledFlags.has('KAIROS')
+      ) {
+        return null
+      }
+      const custom = state.customLoaders['PROACTIVE']
+      if (custom) return custom()
+      return null
+    },
+
+    isSleepToolEnabled: (): boolean =>
+      state.enabledFlags.has('PROACTIVE') || state.enabledFlags.has('KAIROS'),
+
+    loadPushNotificationToolSync: (): unknown => {
+      if (
+        !state.enabledFlags.has('KAIROS') &&
+        !state.enabledFlags.has('KAIROS_PUSH_NOTIFICATION')
+      ) {
+        return null
+      }
+      return null
+    },
+
+    isPushNotificationEnabled: (): boolean =>
+      state.enabledFlags.has('KAIROS') ||
+      state.enabledFlags.has('KAIROS_PUSH_NOTIFICATION'),
+
+    loadCoordinatorModeModuleSync: (): unknown => {
+      if (!state.enabledFlags.has('COORDINATOR_MODE')) return null
+      return null
+    },
+
+    isTranscriptClassifierEnabled: (): boolean =>
+      state.enabledFlags.has('TRANSCRIPT_CLASSIFIER' as FeatureGatedToolFlag),
+
     listEnabledFeatureGatedTools: (): FeatureGatedToolFlag[] =>
       Array.from(state.enabledFlags),
 

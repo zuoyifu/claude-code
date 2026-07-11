@@ -10,7 +10,7 @@ const noop = () => {}
 
 mock.module('bun:bundle', () => ({ feature: () => false }))
 
-mock.module('src/constants/tools.js', () => ({
+mock.module('src/tools/registry/whitelists.js', () => ({
   ALL_AGENT_DISALLOWED_TOOLS: new Set(),
   ASYNC_AGENT_ALLOWED_TOOLS: new Set(),
   CUSTOM_AGENT_DISALLOWED_TOOLS: new Set(),
@@ -34,7 +34,7 @@ mock.module('src/services/api/dumpPrompts.js', () => ({
   clearDumpState: noop,
 }))
 
-mock.module('src/Tool.js', () => ({
+mock.module('src/tools/core/index.js', () => ({
   toolMatchesName: () => false,
   findToolByName: noop,
 }))

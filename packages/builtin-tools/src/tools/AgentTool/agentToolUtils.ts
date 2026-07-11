@@ -6,7 +6,7 @@ import {
   ASYNC_AGENT_ALLOWED_TOOLS,
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   IN_PROCESS_TEAMMATE_ALLOWED_TOOLS,
-} from 'src/constants/tools.js'
+} from 'src/tools/registry/whitelists.js'
 import { startAgentSummarization } from 'src/services/AgentSummary/agentSummary.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -19,8 +19,8 @@ import type {
   ToolPermissionContext,
   Tools,
   ToolUseContext,
-} from 'src/Tool.js'
-import { toolMatchesName } from 'src/Tool.js'
+} from 'src/tools/core/index.js'
+import { toolMatchesName } from 'src/tools/core/index.js'
 import {
   completeAgentTask as completeAsyncAgent,
   createActivityDescriptionResolver,

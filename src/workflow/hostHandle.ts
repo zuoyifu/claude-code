@@ -6,7 +6,7 @@ import {
 import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
 import type { AssistantMessage } from '../types/message.js'
 import type { AgentId } from '../types/ids.js'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '../tools/core/index.js'
 
 /** Opaque bundle held inside HostHandle (unpacked on the core side). */
 export type WorkflowHostBundle = {

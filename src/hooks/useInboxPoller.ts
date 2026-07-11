@@ -11,9 +11,9 @@ import {
   useAppStateStore,
   useSetAppState,
 } from '../state/AppState.js'
-import { findToolByName } from '../Tool.js'
+import { findToolByName } from '../tools/core/index.js'
 import { isInProcessTeammateTask } from '../tasks/InProcessTeammateTask/types.js'
-import { getAllBaseTools } from '../tools.js'
+import { getAllBaseTools } from '../tools/registry/assembler.js'
 import type { PermissionUpdate } from '../types/permissions.js'
 import { logForDebugging } from '../utils/debug.js'
 import {

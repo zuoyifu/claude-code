@@ -12,7 +12,7 @@
  * and through direct unit tests of the gate functions.
  */
 import { describe, expect, test } from 'bun:test'
-import type { ToolPermissionContext } from '../../../Tool.js'
+import type { ToolPermissionContext } from '../../../tools/core/index.js'
 import type { PermissionMode } from '../PermissionMode.js'
 import { getNextPermissionMode } from '../getNextPermissionMode.js'
 
@@ -143,7 +143,9 @@ describe('permission gate invariants (after opening auto/bypass)', () => {
 
 describe('Tool.ts default context', () => {
   test('getEmptyToolPermissionContext has isBypassPermissionsModeAvailable = true', async () => {
-    const { getEmptyToolPermissionContext } = await import('../../../Tool.js')
+    const { getEmptyToolPermissionContext } = await import(
+      '../../../tools/core/index.js'
+    )
     const ctx = getEmptyToolPermissionContext()
     expect(ctx.isBypassPermissionsModeAvailable).toBe(true)
   })

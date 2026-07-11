@@ -3,8 +3,8 @@
  * the model.
  */
 import { z } from 'zod/v4';
-import type { Tool } from 'src/Tool.js';
-import { buildTool, type ToolDef } from 'src/Tool.js';
+import type { Tool } from 'src/tools/core/index.js';
+import { buildTool, type ToolDef } from 'src/tools/core/index.js';
 import { lazySchema } from 'src/utils/lazySchema.js';
 
 const NAME = 'TestingPermission';

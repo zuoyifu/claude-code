@@ -8,7 +8,10 @@ import {
   test,
 } from 'bun:test'
 import type { AgentSideConnection } from '@agentclientprotocol/sdk'
-import type { Tool as ToolType, ToolUseContext } from '../../../Tool.js'
+import type {
+  Tool as ToolType,
+  ToolUseContext,
+} from '../../../tools/core/index.js'
 import type { AssistantMessage } from '../../../types/message.js'
 
 const askDecision = {

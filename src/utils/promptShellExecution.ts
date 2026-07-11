@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import type { Tool, ToolUseContext } from '../Tool.js'
+import type { Tool, ToolUseContext } from '../tools/core/index.js'
 import { BashTool } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js'
 import { logForDebugging } from './debug.js'
 import { errorMessage, MalformedCommandError, ShellError } from './errors.js'

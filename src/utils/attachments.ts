@@ -1,5 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import type { ToolDiscoveryResult } from '../services/searchExtraTools/prefetch.js'
+import type { ToolDiscoveryResult } from '../tools/discovery/prefetch.js'
 import {
   logEvent,
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -9,7 +9,7 @@ import {
   type Tools,
   type ToolUseContext,
   type ToolPermissionContext,
-} from '../Tool.js'
+} from '../tools/core/index.js'
 import {
   FileReadTool,
   MaxFileReadTokenExceededError,
@@ -101,7 +101,7 @@ const skillSearchModules = feature('EXPERIMENTAL_SKILL_SEARCH')
 const searchExtraToolsModules = feature('EXPERIMENTAL_SEARCH_EXTRA_TOOLS')
   ? {
       prefetch:
-        require('../services/searchExtraTools/prefetch.js') as typeof import('../services/searchExtraTools/prefetch.js'),
+        require('../tools/discovery/prefetch.js') as typeof import('../tools/discovery/prefetch.js'),
     }
   : null
 const autoModeStateModule = feature('TRANSCRIPT_CLASSIFIER')

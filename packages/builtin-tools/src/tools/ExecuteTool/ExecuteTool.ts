@@ -7,7 +7,7 @@ import {
   type ToolUseContext,
   type ToolResult,
   type Tools,
-} from 'src/Tool.js'
+} from 'src/tools/core/index.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { createUserMessage } from 'src/utils/messages.js'
 import { formatZodValidationError } from 'src/utils/toolErrors.js'

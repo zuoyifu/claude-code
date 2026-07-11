@@ -16,9 +16,12 @@ import {
 } from 'src/commands.js'
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from 'src/tools/core/index.js'
 import type { ThinkingConfig } from 'src/utils/thinking.js'
-import { assembleToolPool, filterToolsByDenyRules } from 'src/tools.js'
+import {
+  assembleToolPool,
+  filterToolsByDenyRules,
+} from 'src/tools/registry/assembler.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { uniq } from 'src/utils/array.js'
 import { mergeAndFilterTools } from 'src/utils/toolPool.js'
@@ -32,7 +35,7 @@ import {
   logForDiagnosticsNoPII,
   withDiagnosticsTiming,
 } from 'src/utils/diagLogs.js'
-import { toolMatchesName, type Tool, type Tools } from 'src/Tool.js'
+import { toolMatchesName, type Tool, type Tools } from 'src/tools/core/index.js'
 import {
   type AgentDefinition,
   isBuiltInAgent,

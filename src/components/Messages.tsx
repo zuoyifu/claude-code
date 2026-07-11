@@ -15,8 +15,8 @@ import { useTerminalNotification } from '@anthropic/ink';
 import { Box, Text } from '@anthropic/ink';
 import { useShortcutDisplay } from '../keybindings/useShortcutDisplay.js';
 import type { Screen } from '../screens/REPL.js';
-import type { Tools } from '../Tool.js';
-import { findToolByName } from '../Tool.js';
+import type { Tools } from '../tools/core/index.js';
+import { findToolByName } from '../tools/core/index.js';
 import type { AgentDefinitionsResult } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import type {
   AssistantMessage,

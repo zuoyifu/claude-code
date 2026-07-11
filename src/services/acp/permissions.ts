@@ -20,7 +20,10 @@ import type {
   PermissionAskDecision,
   PermissionDenyDecision,
 } from '../../types/permissions.js'
-import type { Tool as ToolType, ToolUseContext } from '../../Tool.js'
+import type {
+  Tool as ToolType,
+  ToolUseContext,
+} from '../../tools/core/index.js'
 import type { AssistantMessage } from '../../types/message.js'
 import { hasPermissionsToUseTool } from '../../utils/permissions/permissions.js'
 import { toolInfoFromToolUse } from './bridge.js'

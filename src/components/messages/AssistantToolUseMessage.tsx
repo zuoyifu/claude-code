@@ -6,7 +6,7 @@ import type { Command } from '../../commands.js';
 import { BLACK_CIRCLE } from '../../constants/figures.js';
 import { Box, Text, stringWidth, useTheme } from '@anthropic/ink';
 import { useAppStateMaybeOutsideOfProvider } from '../../state/AppState.js';
-import { findToolByName, type Tool, type ToolProgressData, type Tools } from '../../Tool.js';
+import { findToolByName, type Tool, type ToolProgressData, type Tools } from '../../tools/core/index.js';
 import type { ProgressMessage } from '../../types/message.js';
 import { useIsClassifierChecking } from '../../utils/classifierApprovalsHook.js';
 import { logError } from '../../utils/log.js';

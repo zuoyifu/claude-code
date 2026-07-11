@@ -9,7 +9,7 @@ import {
 import { sanitizeToolNameForAnalytics } from 'src/services/analytics/metadata.js';
 import type { ToolUseConfirm } from '../components/permissions/PermissionRequest.js';
 import { Text } from '@anthropic/ink';
-import type { ToolPermissionContext, Tool as ToolType, ToolUseContext } from '../Tool.js';
+import type { ToolPermissionContext, Tool as ToolType, ToolUseContext } from '../tools/core/index.js';
 import {
   consumeSpeculativeClassifierCheck,
   peekSpeculativeClassifierCheck,

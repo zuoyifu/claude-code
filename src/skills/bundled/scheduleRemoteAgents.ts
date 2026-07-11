@@ -1,7 +1,7 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
 import type { MCPServerConnection } from '../../services/mcp/types.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import { ASK_USER_QUESTION_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/AskUserQuestionTool/prompt.js'
 import { REMOTE_TRIGGER_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/RemoteTriggerTool/prompt.js'
 import { getClaudeAIOAuthTokens } from '../../utils/auth.js'

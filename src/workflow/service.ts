@@ -36,7 +36,7 @@ import {
 } from './progress/store.js'
 import { createWorkflowPorts } from './ports.js'
 import type { CanUseToolFn } from '../hooks/useCanUseTool.js'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '../tools/core/index.js'
 
 /**
  * WorkflowService: the single entry shared by the tool (U7) and panel (U9).

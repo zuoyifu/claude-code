@@ -23,7 +23,7 @@ import type {
   LocalJSXCommandCall,
   LocalJSXCommandOnDone,
 } from '../../types/command.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 
 /** Shape returned by parseArgs when args are invalid. */
 export interface InvalidParsed {

@@ -11,7 +11,7 @@ import * as React from 'react';
 import figures from 'figures';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { VimMode, PromptInputMode } from '../../types/textInputTypes.js';
-import type { ToolPermissionContext } from '../../Tool.js';
+import type { ToolPermissionContext } from '../../tools/core/index.js';
 import { isVimModeEnabled } from './utils.js';
 import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js';
 import {

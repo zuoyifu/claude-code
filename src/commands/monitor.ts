@@ -15,7 +15,7 @@ import type {
   LocalJSXCommandContext,
   LocalJSXCommandOnDone,
 } from '../types/command.js'
-import type { ToolUseContext } from '../Tool.js'
+import type { ToolUseContext } from '../tools/core/index.js'
 
 const monitor = {
   type: 'local-jsx',

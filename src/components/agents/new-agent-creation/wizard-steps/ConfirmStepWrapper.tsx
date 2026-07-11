@@ -5,7 +5,7 @@ import {
   logEvent,
 } from 'src/services/analytics/index.js';
 import { useSetAppState } from 'src/state/AppState.js';
-import type { Tools } from '../../../../Tool.js';
+import type { Tools } from '../../../../tools/core/index.js';
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { getActiveAgentsFromList } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { clearAgentDefinitionsCache } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';

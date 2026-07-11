@@ -5,7 +5,11 @@ import {
   getToolNameForPermissionCheck,
   mcpInfoFromString,
 } from '../../services/mcp/mcpStringUtils.js'
-import type { Tool, ToolPermissionContext, ToolUseContext } from '../../Tool.js'
+import type {
+  Tool,
+  ToolPermissionContext,
+  ToolUseContext,
+} from '../../tools/core/index.js'
 import { AGENT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/AgentTool/constants.js'
 import { shouldUseSandbox } from '@claude-code-best/builtin-tools/tools/BashTool/shouldUseSandbox.js'
 import { BASH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/BashTool/toolName.js'

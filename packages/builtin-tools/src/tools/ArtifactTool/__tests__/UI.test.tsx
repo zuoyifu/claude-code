@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import * as React from 'react';
 import type { ProgressMessage } from 'src/types/message.js';
-import type { ToolProgressData } from 'src/Tool.js';
+import type { ToolProgressData } from 'src/tools/core/index.js';
 import { renderToolResultMessage } from '../UI.js';
 import type { ArtifactOutput } from '../ArtifactTool.js';
 

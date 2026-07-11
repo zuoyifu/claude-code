@@ -1,5 +1,5 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
-import { toolMatchesName, type Tool, type Tools } from './Tool.js'
+import { toolMatchesName, type Tool, type Tools } from '../core/index.js'
 import { AgentTool } from '@claude-code-best/builtin-tools/tools/AgentTool/AgentTool.js'
 import { SkillTool } from '@claude-code-best/builtin-tools/tools/SkillTool/SkillTool.js'
 import { BashTool } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js'
@@ -23,11 +23,6 @@ const SuggestBackgroundPRTool =
     ? require('@claude-code-best/builtin-tools/tools/SuggestBackgroundPRTool/SuggestBackgroundPRTool.js')
         .SuggestBackgroundPRTool
     : null
-const SleepTool =
-  feature('PROACTIVE') || feature('KAIROS')
-    ? require('@claude-code-best/builtin-tools/tools/SleepTool/SleepTool.js')
-        .SleepTool
-    : null
 const cronTools = [
   require('@claude-code-best/builtin-tools/tools/ScheduleCronTool/CronCreateTool.js')
     .CronCreateTool,
@@ -36,27 +31,6 @@ const cronTools = [
   require('@claude-code-best/builtin-tools/tools/ScheduleCronTool/CronListTool.js')
     .CronListTool,
 ]
-const RemoteTriggerTool = feature('AGENT_TRIGGERS_REMOTE')
-  ? require('@claude-code-best/builtin-tools/tools/RemoteTriggerTool/RemoteTriggerTool.js')
-      .RemoteTriggerTool
-  : null
-const MonitorTool = feature('MONITOR_TOOL')
-  ? require('@claude-code-best/builtin-tools/tools/MonitorTool/MonitorTool.js')
-      .MonitorTool
-  : null
-const SendUserFileTool = feature('KAIROS')
-  ? require('@claude-code-best/builtin-tools/tools/SendUserFileTool/SendUserFileTool.js')
-      .SendUserFileTool
-  : null
-const PushNotificationTool =
-  feature('KAIROS') || feature('KAIROS_PUSH_NOTIFICATION')
-    ? require('@claude-code-best/builtin-tools/tools/PushNotificationTool/PushNotificationTool.js')
-        .PushNotificationTool
-    : null
-const SubscribePRTool = feature('KAIROS_GITHUB_WEBHOOKS')
-  ? require('@claude-code-best/builtin-tools/tools/SubscribePRTool/SubscribePRTool.js')
-      .SubscribePRTool
-  : null
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import { TaskOutputTool } from '@claude-code-best/builtin-tools/tools/TaskOutputTool/TaskOutputTool.js'
 import { WebSearchTool } from '@claude-code-best/builtin-tools/tools/WebSearchTool/WebSearchTool.js'
@@ -66,7 +40,7 @@ import { ArtifactTool } from '@claude-code-best/builtin-tools/tools/ArtifactTool
 import { TestingPermissionTool } from '@claude-code-best/builtin-tools/tools/testing/TestingPermissionTool.js'
 import { GrepTool } from '@claude-code-best/builtin-tools/tools/GrepTool/GrepTool.js'
 import { TungstenTool } from '@claude-code-best/builtin-tools/tools/TungstenTool/TungstenTool.js'
-// Lazy require to break circular dependency: tools.ts -> TeamCreateTool/TeamDeleteTool -> ... -> tools.ts
+// Lazy require to break circular dependency: assembler.ts -> TeamCreateTool/TeamDeleteTool -> ... -> assembler.ts
 /* eslint-disable @typescript-eslint/no-require-imports */
 const getTeamCreateTool = () =>
   require('@claude-code-best/builtin-tools/tools/TeamCreateTool/TeamCreateTool.js')
@@ -88,10 +62,6 @@ import { EnterPlanModeTool } from '@claude-code-best/builtin-tools/tools/EnterPl
 import { EnterWorktreeTool } from '@claude-code-best/builtin-tools/tools/EnterWorktreeTool/EnterWorktreeTool.js'
 import { ExitWorktreeTool } from '@claude-code-best/builtin-tools/tools/ExitWorktreeTool/ExitWorktreeTool.js'
 import { ConfigTool } from '@claude-code-best/builtin-tools/tools/ConfigTool/ConfigTool.js'
-const GoalTool = feature('GOAL')
-  ? require('@claude-code-best/builtin-tools/tools/GoalTool/GoalTool.js')
-      .GoalTool
-  : null
 import { LocalMemoryRecallTool } from '@claude-code-best/builtin-tools/tools/LocalMemoryRecallTool/LocalMemoryRecallTool.js'
 import { VaultHttpFetchTool } from '@claude-code-best/builtin-tools/tools/VaultHttpFetchTool/VaultHttpFetchTool.js'
 import { TaskCreateTool } from '@claude-code-best/builtin-tools/tools/TaskCreateTool/TaskCreateTool.js'
@@ -99,8 +69,8 @@ import { TaskGetTool } from '@claude-code-best/builtin-tools/tools/TaskGetTool/T
 import { TaskUpdateTool } from '@claude-code-best/builtin-tools/tools/TaskUpdateTool/TaskUpdateTool.js'
 import { TaskListTool } from '@claude-code-best/builtin-tools/tools/TaskListTool/TaskListTool.js'
 import uniqBy from 'lodash-es/uniqBy.js'
-import { isSearchExtraToolsEnabledOptimistic } from './utils/searchExtraTools.js'
-import { isTodoV2Enabled } from './utils/tasks.js'
+import { isSearchExtraToolsEnabledOptimistic } from '../../utils/searchExtraTools.js'
+import { isTodoV2Enabled } from '../../utils/tasks.js'
 // Dead code elimination: conditional import for CLAUDE_CODE_VERIFY_PLAN
 /* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 const VerifyPlanExecutionTool =
@@ -115,56 +85,21 @@ export {
   CUSTOM_AGENT_DISALLOWED_TOOLS,
   ASYNC_AGENT_ALLOWED_TOOLS,
   COORDINATOR_MODE_ALLOWED_TOOLS,
-} from './constants/tools.js'
-import { feature } from 'bun:bundle'
-// Dead code elimination: conditional import for OVERFLOW_TEST_TOOL
-/* eslint-disable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-const OverflowTestTool = feature('OVERFLOW_TEST_TOOL')
-  ? require('@claude-code-best/builtin-tools/tools/OverflowTestTool/OverflowTestTool.js')
-      .OverflowTestTool
-  : null
-const CtxInspectTool = feature('CONTEXT_COLLAPSE')
-  ? require('@claude-code-best/builtin-tools/tools/CtxInspectTool/CtxInspectTool.js')
-      .CtxInspectTool
-  : null
-const TerminalCaptureTool = feature('TERMINAL_PANEL')
-  ? require('@claude-code-best/builtin-tools/tools/TerminalCaptureTool/TerminalCaptureTool.js')
-      .TerminalCaptureTool
-  : null
-const WebBrowserTool = feature('WEB_BROWSER_TOOL')
-  ? require('@claude-code-best/builtin-tools/tools/WebBrowserTool/WebBrowserTool.js')
-      .WebBrowserTool
-  : null
-const coordinatorModeModule = feature('COORDINATOR_MODE')
-  ? (require('./coordinator/coordinatorMode.js') as typeof import('./coordinator/coordinatorMode.js'))
-  : null
-const SnipTool = feature('HISTORY_SNIP')
-  ? require('@claude-code-best/builtin-tools/tools/SnipTool/SnipTool.js')
-      .SnipTool
-  : null
-const DiscoverSkillsTool = feature('EXPERIMENTAL_SKILL_SEARCH')
-  ? require('@claude-code-best/builtin-tools/tools/DiscoverSkillsTool/DiscoverSkillsTool.js')
-      .DiscoverSkillsTool
-  : null
-const ReviewArtifactTool = feature('REVIEW_ARTIFACT')
-  ? require('@claude-code-best/builtin-tools/tools/ReviewArtifactTool/ReviewArtifactTool.js')
-      .ReviewArtifactTool
-  : null
-const ListPeersTool = feature('UDS_INBOX')
-  ? require('@claude-code-best/builtin-tools/tools/ListPeersTool/ListPeersTool.js')
-      .ListPeersTool
-  : null
-const WorkflowTool = feature('WORKFLOW_SCRIPTS')
-  ? require('./workflow/wiring.js').createWorkflowToolCore()
-  : null
-/* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
-import type { ToolPermissionContext } from './Tool.js'
-import { getDenyRuleForTool } from './utils/permissions/permissions.js'
-import { hasEmbeddedSearchTools } from './utils/embeddedTools.js'
-import { isEnvTruthy } from './utils/envUtils.js'
-import { isPowerShellToolEnabled } from './utils/shell/shellToolUtils.js'
-import { isAgentSwarmsEnabled } from './utils/agentSwarmsEnabled.js'
-import { isWorktreeModeEnabled } from './utils/worktreeModeEnabled.js'
+} from './whitelists.js'
+// C2: feature() 边界化 —— 所有 feature-gated 工具加载通过 feature-gate.ts 边界
+// 本文件不再 import { feature } from 'bun:bundle'
+import {
+  loadFeatureGatedToolSync,
+  loadSleepToolSync,
+  loadPushNotificationToolSync,
+  loadCoordinatorModeModuleSync,
+} from './feature-gate.js'
+import type { ToolPermissionContext } from '../core/index.js'
+import { getDenyRuleForTool } from '../../utils/permissions/permissions.js'
+import { hasEmbeddedSearchTools } from '../../utils/embeddedTools.js'
+import { isEnvTruthy } from '../../utils/envUtils.js'
+import { isPowerShellToolEnabled } from '../../utils/shell/shellToolUtils.js'
+import { isWorktreeModeEnabled } from '../../utils/worktreeModeEnabled.js'
 import {
   REPL_TOOL_NAME,
   REPL_ONLY_TOOLS,
@@ -216,6 +151,27 @@ export function getToolsForDefaultPreset(): string[] {
  * NOTE: This MUST stay in sync with https://console.statsig.com/4aF3Ewatb6xPVpCwxb5nA3/dynamic_configs/claude_code_global_system_caching, in order to cache the system prompt across users.
  */
 export function getAllBaseTools(): Tools {
+  // C2: 通过 feature-gate 边界同步加载 feature-gated 工具（Plan B：保持 getTools 同步）
+  const RemoteTriggerTool = loadFeatureGatedToolSync('AGENT_TRIGGERS_REMOTE')
+  const MonitorTool = loadFeatureGatedToolSync('MONITOR_TOOL')
+  const SendUserFileTool = loadFeatureGatedToolSync('KAIROS')
+  const SubscribePRTool = loadFeatureGatedToolSync('KAIROS_GITHUB_WEBHOOKS')
+  const GoalTool = loadFeatureGatedToolSync('GOAL')
+  const OverflowTestTool = loadFeatureGatedToolSync('OVERFLOW_TEST_TOOL')
+  const CtxInspectTool = loadFeatureGatedToolSync('CONTEXT_COLLAPSE')
+  const TerminalCaptureTool = loadFeatureGatedToolSync('TERMINAL_PANEL')
+  const WebBrowserTool = loadFeatureGatedToolSync('WEB_BROWSER_TOOL')
+  const SnipTool = loadFeatureGatedToolSync('HISTORY_SNIP')
+  const DiscoverSkillsTool = loadFeatureGatedToolSync(
+    'EXPERIMENTAL_SKILL_SEARCH',
+  )
+  const ReviewArtifactTool = loadFeatureGatedToolSync('REVIEW_ARTIFACT')
+  const ListPeersTool = loadFeatureGatedToolSync('UDS_INBOX')
+  const WorkflowTool = loadFeatureGatedToolSync('WORKFLOW_SCRIPTS')
+  // OR-semantics 工具（封装 PROACTIVE||KAIROS、KAIROS||KAIROS_PUSH_NOTIFICATION）
+  const SleepTool = loadSleepToolSync()
+  const PushNotificationTool = loadPushNotificationToolSync()
+
   return [
     AgentTool,
     TaskOutputTool,
@@ -309,10 +265,9 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
     // below which also hides REPL_ONLY_TOOLS when REPL is enabled.
     if (isReplModeEnabled() && REPLTool) {
       const replSimple: Tool[] = [REPLTool]
-      if (
-        feature('COORDINATOR_MODE') &&
-        coordinatorModeModule?.isCoordinatorMode()
-      ) {
+      // C2: coordinator mode 检查通过 feature-gate 边界
+      const coordinatorModule = loadCoordinatorModeModuleSync()
+      if (coordinatorModule?.isCoordinatorMode()) {
         replSimple.push(TaskStopTool, getSendMessageTool())
       }
       return filterToolsByDenyRules(replSimple, permissionContext)
@@ -321,10 +276,8 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
     // When coordinator mode is also active, include AgentTool and TaskStopTool
     // so the coordinator gets Task+TaskStop (via useMergedTools filtering) and
     // workers get Bash/Read/Edit (via filterToolsForAgent filtering).
-    if (
-      feature('COORDINATOR_MODE') &&
-      coordinatorModeModule?.isCoordinatorMode()
-    ) {
+    const coordinatorModule = loadCoordinatorModeModuleSync()
+    if (coordinatorModule?.isCoordinatorMode()) {
       simpleTools.push(AgentTool, TaskStopTool, getSendMessageTool())
     }
     return filterToolsByDenyRules(simpleTools, permissionContext)

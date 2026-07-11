@@ -1,6 +1,6 @@
 import type { Attachment } from '../../utils/attachments.js'
 import type { Message } from '../../types/message.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import type { DiscoverySignal } from './signals.js'
 import { isSkillSearchEnabled } from './featureCheck.js'
 import {

@@ -3,7 +3,7 @@ import { basename } from 'path';
 import React, { useRef } from 'react';
 import { useMinDisplayTime } from '../../hooks/useMinDisplayTime.js';
 import { Ansi, Box, Text, useTheme } from '@anthropic/ink';
-import { findToolByName, type Tools } from '../../Tool.js';
+import { findToolByName, type Tools } from '../../tools/core/index.js';
 import { getReplPrimitiveTools } from '@claude-code-best/builtin-tools/tools/REPLTool/primitiveTools.js';
 import type { CollapsedReadSearchGroup, NormalizedAssistantMessage } from '../../types/message.js';
 import { uniq } from '../../utils/array.js';

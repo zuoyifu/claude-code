@@ -60,7 +60,7 @@ mock.module('src/services/skillSearch/prefetch.js', () => ({
 const mockGetToolIndex = mock(() => Promise.resolve([] as never[]))
 const mockSearchTools = mock(() => [] as never[])
 
-mock.module('src/services/searchExtraTools/toolIndex.js', () => ({
+mock.module('src/tools/discovery/tfidf-index.js', () => ({
   getToolIndex: mockGetToolIndex,
   searchTools: mockSearchTools,
   clearToolIndexCache: () => {},

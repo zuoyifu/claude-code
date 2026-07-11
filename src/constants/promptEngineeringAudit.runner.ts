@@ -203,7 +203,7 @@ import {
   computeSimpleEnvInfo,
   getScratchpadInstructions,
 } from './prompts.js'
-import type { Tools } from '../Tool.js'
+import type { Tools } from '../tools/core/index.js'
 
 // --- 辅助 ---
 

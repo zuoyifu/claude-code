@@ -13,7 +13,7 @@ import {
   markFirstTeleportMessageLogged,
   setLastApiCompletionTimestamp,
 } from 'src/bootstrap/state.js'
-import type { QueryChainTracking } from 'src/Tool.js'
+import type { QueryChainTracking } from 'src/tools/core/index.js'
 import { isConnectorTextBlock } from 'src/types/connectorText.js'
 import type { AssistantMessage } from 'src/types/message.js'
 import { logForDebugging } from 'src/utils/debug.js'

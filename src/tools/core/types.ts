@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useImportType: runtime re-export needs value import
 import type {
   ToolResultBlockParam,
   ToolUseBlockParam,
@@ -9,9 +10,9 @@ import type {
 } from '@modelcontextprotocol/sdk/types.js'
 import type { UUID } from 'crypto'
 import type { z } from 'zod/v4'
-import type { Command } from './commands.js'
-import type { CanUseToolFn } from './hooks/useCanUseTool.js'
-import type { ThinkingConfig } from './utils/thinking.js'
+import type { Command } from '../../commands.js'
+import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+import type { ThinkingConfig } from '../../utils/thinking.js'
 
 export type ToolInputJSONSchema = {
   [x: string]: unknown
@@ -21,11 +22,11 @@ export type ToolInputJSONSchema = {
   }
 }
 
-import type { Notification } from './context/notifications.js'
+import type { Notification } from '../../context/notifications.js'
 import type {
   MCPServerConnection,
   ServerResource,
-} from './services/mcp/types.js'
+} from '../../services/mcp/types.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,
@@ -38,14 +39,14 @@ import type {
   SystemLocalCommandMessage,
   SystemMessage,
   UserMessage,
-} from './types/message.js'
+} from '../../types/message.js'
 // Import permission types from centralized location to break import cycles
 // Import PermissionResult from centralized location to break import cycles
 import type {
   AdditionalWorkingDirectory,
   PermissionMode,
   PermissionResult,
-} from './types/permissions.js'
+} from '../../types/permissions.js'
 // Import tool progress types from centralized location to break import cycles
 import type {
   AgentToolProgress,
@@ -56,27 +57,27 @@ import type {
   TaskOutputProgress,
   ToolProgressData,
   WebSearchProgress,
-} from './types/tools.js'
-import type { FileStateCache } from './utils/fileStateCache.js'
-import type { DenialTrackingState } from './utils/permissions/denialTracking.js'
-import type { SystemPrompt } from './utils/systemPromptType.js'
-import type { ContentReplacementState } from './utils/toolResultStorage.js'
+} from '../../types/tools.js'
+import type { FileStateCache } from '../../utils/fileStateCache.js'
+import type { DenialTrackingState } from '../../utils/permissions/denialTracking.js'
+import type { SystemPrompt } from '../../utils/systemPromptType.js'
+import type { ContentReplacementState } from '../../utils/toolResultStorage.js'
 
-import type { SpinnerMode } from './components/Spinner.js'
-import type { QuerySource } from './constants/querySource.js'
-import type { SDKStatus } from './entrypoints/agentSdkTypes.js'
-import type { AppState } from './state/AppState.js'
-import type { LangfuseSpan } from './services/langfuse/index.js'
+import type { SpinnerMode } from '../../components/Spinner.js'
+import type { QuerySource } from '../../constants/querySource.js'
+import type { SDKStatus } from '../../entrypoints/agentSdkTypes.js'
+import type { AppState } from '../../state/AppState.js'
+import type { LangfuseSpan } from '../../services/langfuse/index.js'
 import type {
   HookProgress,
   PromptRequest,
   PromptResponse,
-} from './types/hooks.js'
-import type { AgentId } from './types/ids.js'
-import type { DeepImmutable } from './types/utils.js'
-import type { AttributionState } from './utils/commitAttribution.js'
-import type { FileHistoryState } from './utils/fileHistory.js'
-import type { Theme, ThemeName } from './utils/theme.js'
+} from '../../types/hooks.js'
+import type { AgentId } from '../../types/ids.js'
+import type { DeepImmutable } from '../../types/utils.js'
+import type { AttributionState } from '../../utils/commitAttribution.js'
+import type { FileHistoryState } from '../../utils/fileHistory.js'
+import type { Theme, ThemeName } from '../../utils/theme.js'
 
 export type QueryChainTracking = {
   chainId: string
@@ -105,7 +106,7 @@ export type SetToolJSXFn = (
 ) => void
 
 // Import tool permission types from centralized location to break import cycles
-import type { ToolPermissionRulesBySource } from './types/permissions.js'
+import type { ToolPermissionRulesBySource } from '../../types/permissions.js'
 
 // Re-export for backwards compatibility
 export type { ToolPermissionRulesBySource }
@@ -351,23 +352,6 @@ export type ToolCallProgress<P extends ToolProgressData = ToolProgressData> = (
 
 // Type for any schema that outputs an object with string keys
 export type AnyObject = z.ZodType<{ [key: string]: unknown }>
-
-/**
- * Checks if a tool matches the given name (primary name or alias).
- */
-export function toolMatchesName(
-  tool: { name: string; aliases?: string[] },
-  name: string,
-): boolean {
-  return tool.name === name || (tool.aliases?.includes(name) ?? false)
-}
-
-/**
- * Finds a tool by name or alias from a list of tools.
- */
-export function findToolByName(tools: Tools, name: string): Tool | undefined {
-  return tools.find(t => toolMatchesName(t, name))
-}
 
 export type Tool<
   Input extends AnyObject = AnyObject,
@@ -709,94 +693,3 @@ export type Tool<
  * to track where tool sets are assembled, passed, and filtered across the codebase.
  */
 export type Tools = readonly Tool[]
-
-/**
- * Methods that `buildTool` supplies a default for. A `ToolDef` may omit these;
- * the resulting `Tool` always has them.
- */
-type DefaultableToolKeys =
-  | 'isEnabled'
-  | 'isConcurrencySafe'
-  | 'isReadOnly'
-  | 'isDestructive'
-  | 'checkPermissions'
-  | 'toAutoClassifierInput'
-  | 'userFacingName'
-
-/**
- * Tool definition accepted by `buildTool`. Same shape as `Tool` but with the
- * defaultable methods optional — `buildTool` fills them in so callers always
- * see a complete `Tool`.
- */
-export type ToolDef<
-  Input extends AnyObject = AnyObject,
-  Output = unknown,
-  P extends ToolProgressData = ToolProgressData,
-> = Omit<Tool<Input, Output, P>, DefaultableToolKeys> &
-  Partial<Pick<Tool<Input, Output, P>, DefaultableToolKeys>>
-
-/**
- * Type-level spread mirroring `{ ...TOOL_DEFAULTS, ...def }`. For each
- * defaultable key: if D provides it (required), D's type wins; if D omits
- * it or has it optional (inherited from Partial<> in the constraint), the
- * default fills in. All other keys come from D verbatim — preserving arity,
- * optional presence, and literal types exactly as `satisfies Tool` did.
- */
-type BuiltTool<D> = Omit<D, DefaultableToolKeys> & {
-  [K in DefaultableToolKeys]-?: K extends keyof D
-    ? undefined extends D[K]
-      ? ToolDefaults[K]
-      : D[K]
-    : ToolDefaults[K]
-}
-
-/**
- * Build a complete `Tool` from a partial definition, filling in safe defaults
- * for the commonly-stubbed methods. All tool exports should go through this so
- * that defaults live in one place and callers never need `?.() ?? default`.
- *
- * Defaults (fail-closed where it matters):
- * - `isEnabled` → `true`
- * - `isConcurrencySafe` → `false` (assume not safe)
- * - `isReadOnly` → `false` (assume writes)
- * - `isDestructive` → `false`
- * - `checkPermissions` → `{ behavior: 'allow', updatedInput }` (defer to general permission system)
- * - `toAutoClassifierInput` → `''` (skip classifier — security-relevant tools must override)
- * - `userFacingName` → `name`
- */
-const TOOL_DEFAULTS = {
-  isEnabled: () => true,
-  isConcurrencySafe: (_input?: unknown) => false,
-  isReadOnly: (_input?: unknown) => false,
-  isDestructive: (_input?: unknown) => false,
-  checkPermissions: (
-    input: { [key: string]: unknown },
-    _ctx?: ToolUseContext,
-  ): Promise<PermissionResult> =>
-    Promise.resolve({ behavior: 'allow', updatedInput: input }),
-  toAutoClassifierInput: (_input?: unknown) => '',
-  userFacingName: (_input?: unknown) => '',
-}
-
-// The defaults type is the ACTUAL shape of TOOL_DEFAULTS (optional params so
-// both 0-arg and full-arg call sites type-check — stubs varied in arity and
-// tests relied on that), not the interface's strict signatures.
-type ToolDefaults = typeof TOOL_DEFAULTS
-
-// D infers the concrete object-literal type from the call site. The
-// constraint provides contextual typing for method parameters; `any` in
-// constraint position is structural and never leaks into the return type.
-// BuiltTool<D> mirrors runtime `{...TOOL_DEFAULTS, ...def}` at the type level.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyToolDef = ToolDef<any, any, any>
-
-export function buildTool<D extends AnyToolDef>(def: D): BuiltTool<D> {
-  // The runtime spread is straightforward; the `as` bridges the gap between
-  // the structural-any constraint and the precise BuiltTool<D> return. The
-  // type semantics are proven by the 0-error typecheck across all 60+ tools.
-  return {
-    ...TOOL_DEFAULTS,
-    userFacingName: () => def.name,
-    ...def,
-  } as BuiltTool<D>
-}

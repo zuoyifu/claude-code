@@ -14,7 +14,7 @@ import {
 } from '../../services/langfuse/index.js'
 import { getSessionId } from '../../bootstrap/state.js'
 import { getAPIProvider } from '../model/providers.js'
-import { getEmptyToolPermissionContext } from '../../Tool.js'
+import { getEmptyToolPermissionContext } from '../../tools/core/index.js'
 import type { Message } from '../../types/message.js'
 import { createAbortController } from '../abortController.js'
 import { count } from '../array.js'

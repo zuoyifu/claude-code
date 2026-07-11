@@ -1,6 +1,6 @@
 import { feature } from 'bun:bundle';
 import * as React from 'react';
-import { buildTool, type ToolDef, toolMatchesName } from 'src/Tool.js';
+import { buildTool, type ToolDef, toolMatchesName } from 'src/tools/core/index.js';
 import type { AssistantMessage, Message as MessageType, NormalizedUserMessage } from 'src/types/message.js';
 import { getQuerySourceForAgent } from 'src/utils/promptCategory.js';
 import { z } from 'zod/v4';
@@ -37,7 +37,7 @@ import {
   registerRemoteAgentTask,
   type BackgroundRemoteSessionPrecondition,
 } from 'src/tasks/RemoteAgentTask/RemoteAgentTask.js';
-import { assembleToolPool } from 'src/tools.js';
+import { assembleToolPool } from 'src/tools/registry/assembler.js';
 import { filterParentToolsForFork } from 'src/utils/agentToolFilter.js';
 import { asAgentId } from 'src/types/ids.js';
 import { runWithAgentContext, type SubagentContext } from 'src/utils/agentContext.js';

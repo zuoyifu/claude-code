@@ -10,7 +10,7 @@ import type {
   SystemAPIErrorMessage,
   AssistantMessage,
 } from '../../../types/message.js'
-import type { Tools } from '../../../Tool.js'
+import type { Tools } from '../../../tools/core/index.js'
 import type {
   ChatCompletionChunk,
   ChatCompletionCreateParamsStreaming,

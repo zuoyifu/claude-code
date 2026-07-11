@@ -12,7 +12,7 @@ import { markPostCompaction } from 'src/bootstrap/state.js'
 import { getInvokedSkillsForAgent } from '../../bootstrap/state.js'
 import type { QuerySource } from '../../constants/querySource.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
-import type { Tool, ToolUseContext } from '../../Tool.js'
+import type { Tool, ToolUseContext } from '../../tools/core/index.js'
 import type { LocalAgentTaskState } from '../../tasks/LocalAgentTask/LocalAgentTask.js'
 import { FileReadTool } from '@claude-code-best/builtin-tools/tools/FileReadTool/FileReadTool.js'
 import {

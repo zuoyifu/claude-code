@@ -17,8 +17,8 @@ import {
 } from '../remote/sdkMessageAdapter.js'
 import { useSetAppState } from '../state/AppState.js'
 import type { AppState } from '../state/AppStateStore.js'
-import type { Tool } from '../Tool.js'
-import { findToolByName } from '../Tool.js'
+import type { Tool } from '../tools/core/index.js'
+import { findToolByName } from '../tools/core/index.js'
 import type { Message as MessageType } from '../types/message.js'
 import type {
   PermissionAskDecision,

@@ -27,7 +27,7 @@ import {
   isAutoMemoryEnabled,
   isAutoMemPath,
 } from '../../memdir/paths.js'
-import type { Tool } from '../../Tool.js'
+import type { Tool } from '../../tools/core/index.js'
 import { BASH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/BashTool/toolName.js'
 import { FILE_EDIT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileEditTool/constants.js'
 import { FILE_READ_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/FileReadTool/prompt.js'

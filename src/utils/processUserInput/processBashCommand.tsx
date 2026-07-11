@@ -2,7 +2,7 @@ import type { ContentBlockParam } from '@anthropic-ai/sdk/resources';
 import { randomUUID } from 'crypto';
 import * as React from 'react';
 import { BashModeProgress } from 'src/components/BashModeProgress.js';
-import type { SetToolJSXFn } from 'src/Tool.js';
+import type { SetToolJSXFn } from 'src/tools/core/index.js';
 import { BashTool } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js';
 import type { AttachmentMessage, SystemMessage, UserMessage } from 'src/types/message.js';
 import type { ShellProgress } from 'src/types/tools.js';

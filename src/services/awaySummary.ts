@@ -1,5 +1,5 @@
 import { APIUserAbortError } from '@anthropic-ai/sdk'
-import { getEmptyToolPermissionContext } from '../Tool.js'
+import { getEmptyToolPermissionContext } from '../tools/core/index.js'
 import type { Message } from '../types/message.js'
 import { logForDebugging } from '../utils/debug.js'
 import {

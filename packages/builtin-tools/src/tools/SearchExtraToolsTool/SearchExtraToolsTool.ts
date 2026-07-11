@@ -11,7 +11,7 @@ import {
   type Tool,
   type ToolDef,
   type Tools,
-} from 'src/Tool.js'
+} from 'src/tools/core/index.js'
 import { logForDebugging } from 'src/utils/debug.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { escapeRegExp } from 'src/utils/stringUtils.js'
@@ -21,11 +21,8 @@ import {
   isDeferredTool,
   SEARCH_EXTRA_TOOLS_TOOL_NAME,
 } from './prompt.js'
-import {
-  getToolIndex,
-  searchTools,
-} from 'src/services/searchExtraTools/toolIndex.js'
-import type { SearchExtraToolsResult } from 'src/services/searchExtraTools/toolIndex.js'
+import { getToolIndex, searchTools } from 'src/tools/discovery/tfidf-index.js'
+import type { SearchExtraToolsResult } from 'src/tools/discovery/tfidf-index.js'
 
 const KEYWORD_WEIGHT = Number(
   process.env.SEARCH_EXTRA_TOOLS_WEIGHT_KEYWORD ?? '0.4',

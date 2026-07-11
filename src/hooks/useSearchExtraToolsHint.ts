@@ -4,7 +4,7 @@ import {
   getSearchExtraToolsPrefetchSnapshot,
   clearSearchExtraToolsPrefetchResults,
   type ToolDiscoveryResult,
-} from 'src/services/searchExtraTools/prefetch.js'
+} from 'src/tools/discovery/prefetch.js'
 
 type SearchExtraToolsHintItem = {
   name: string

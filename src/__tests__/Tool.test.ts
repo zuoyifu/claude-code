@@ -5,7 +5,7 @@ import {
   findToolByName,
   getEmptyToolPermissionContext,
   filterToolProgressMessages,
-} from '../Tool'
+} from '../tools/core/index.js'
 
 // Minimal tool definition for testing buildTool
 function makeMinimalToolDef(overrides: Record<string, unknown> = {}) {

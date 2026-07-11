@@ -6,7 +6,7 @@ import { addDirHelpMessage, validateDirectoryForWorkspace } from '../../../comma
 import TextInput from '../../../components/TextInput.js';
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink';
 import { useKeybinding } from '../../../keybindings/useKeybinding.js';
-import type { ToolPermissionContext } from '../../../Tool.js';
+import type { ToolPermissionContext } from '../../../tools/core/index.js';
 import { getDirectoryCompletions } from '../../../utils/suggestions/directoryCompletion.js';
 import { ConfigurableShortcutHint } from '../../ConfigurableShortcutHint.js';
 import { Select } from '../../CustomSelect/select.js';

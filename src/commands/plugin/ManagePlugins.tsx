@@ -38,7 +38,7 @@ import {
   type InstallableScope,
 } from '../../services/plugins/pluginOperations.js';
 import { useAppState } from '../../state/AppState.js';
-import type { Tool } from '../../Tool.js';
+import type { Tool } from '../../tools/core/index.js';
 import type { LoadedPlugin, PluginError } from '../../types/plugin.js';
 import { count } from '../../utils/array.js';
 import { openBrowser } from '../../utils/browser.js';

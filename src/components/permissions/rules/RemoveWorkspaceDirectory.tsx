@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { Select } from '../../../components/CustomSelect/select.js';
 import { Box, Text } from '@anthropic/ink';
-import type { ToolPermissionContext } from '../../../Tool.js';
+import type { ToolPermissionContext } from '../../../tools/core/index.js';
 import { applyPermissionUpdate } from '../../../utils/permissions/PermissionUpdate.js';
 import { Dialog } from '@anthropic/ink';
 

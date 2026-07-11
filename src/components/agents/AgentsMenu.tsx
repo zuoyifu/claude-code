@@ -7,7 +7,7 @@ import { useExitOnCtrlCDWithKeybindings } from '../../hooks/useExitOnCtrlCDWithK
 import { useMergedTools } from '../../hooks/useMergedTools.js';
 import { Box, Text } from '@anthropic/ink';
 import { useAppState, useSetAppState } from '../../state/AppState.js';
-import type { Tools } from '../../Tool.js';
+import type { Tools } from '../../tools/core/index.js';
 import {
   type ResolvedAgent,
   resolveAgentOverrides,

@@ -8,7 +8,7 @@ import {
   useAppStateStore,
   useSetAppState,
 } from '../../state/AppState.js'
-import type { ToolPermissionContext } from '../../Tool.js'
+import type { ToolPermissionContext } from '../../tools/core/index.js'
 import { verifyAutoModeGateAccess } from './permissionSetup.js'
 
 /**

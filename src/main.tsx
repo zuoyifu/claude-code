@@ -56,12 +56,12 @@ import {
   waitForPolicyLimitsToLoad,
 } from './services/policyLimits/index.js';
 import { loadRemoteManagedSettings, refreshRemoteManagedSettings } from './services/remoteManagedSettings/index.js';
-import type { ToolInputJSONSchema } from './Tool.js';
+import type { ToolInputJSONSchema } from './tools/core/index.js';
 import {
   createSyntheticOutputTool,
   isSyntheticOutputToolEnabled,
 } from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js';
-import { getTools } from './tools.js';
+import { getTools } from './tools/registry/assembler.js';
 import {
   canUserConfigureAdvisor,
   getInitialAdvisorSetting,

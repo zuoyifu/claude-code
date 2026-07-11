@@ -10,7 +10,7 @@ import type {
   ToolPermissionContext,
   Tool as ToolType,
   ToolUseContext,
-} from '../../Tool.js'
+} from '../../tools/core/index.js'
 import { awaitClassifierAutoApproval } from '@claude-code-best/builtin-tools/tools/BashTool/bashPermissions.js'
 import { BASH_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/BashTool/toolName.js'
 import type { AssistantMessage } from '../../types/message.js'

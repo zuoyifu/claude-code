@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { type KeyboardEvent, Box, Byline, KeyboardShortcutHint, Text } from '@anthropic/ink';
 import { useKeybinding } from '../../../../keybindings/useKeybinding.js';
 import { isAutoMemoryEnabled } from '../../../../memdir/paths.js';
-import type { Tools } from '../../../../Tool.js';
+import type { Tools } from '../../../../tools/core/index.js';
 import { getMemoryScopeDisplay } from '@claude-code-best/builtin-tools/tools/AgentTool/agentMemory.js';
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { truncateToWidth } from '../../../../utils/format.js';

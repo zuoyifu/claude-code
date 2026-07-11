@@ -13,8 +13,8 @@ import {
   type DirectConnectConfig,
   DirectConnectSessionManager,
 } from '../server/directConnectManager.js'
-import type { Tool } from '../Tool.js'
-import { findToolByName } from '../Tool.js'
+import type { Tool } from '../tools/core/index.js'
+import { findToolByName } from '../tools/core/index.js'
 import type { Message as MessageType } from '../types/message.js'
 import type {
   PermissionAskDecision,

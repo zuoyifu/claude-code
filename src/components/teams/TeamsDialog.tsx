@@ -9,7 +9,7 @@ import { Box, Text, useInput, stringWidth } from '@anthropic/ink';
 import { useKeybindings } from '../../keybindings/useKeybinding.js';
 import { useShortcutDisplay } from '../../keybindings/useShortcutDisplay.js';
 import { type AppState, useAppState, useSetAppState } from '../../state/AppState.js';
-import { getEmptyToolPermissionContext } from '../../Tool.js';
+import { getEmptyToolPermissionContext } from '../../tools/core/index.js';
 import { AGENT_COLOR_TO_THEME_COLOR } from '@claude-code-best/builtin-tools/tools/AgentTool/agentColorManager.js';
 import { logForDebugging } from '../../utils/debug.js';
 import { execFileNoThrow } from '../../utils/execFileNoThrow.js';

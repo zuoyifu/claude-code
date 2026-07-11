@@ -15,8 +15,8 @@
  * See docs/jira/LOCAL-WIRING-DESIGN.md §4.5 / §5.5 for design rationale.
  */
 
-import { ALL_AGENT_DISALLOWED_TOOLS } from '../constants/tools.js'
-import type { Tool } from '../Tool.js'
+import { ALL_AGENT_DISALLOWED_TOOLS } from '../tools/registry/whitelists.js'
+import type { Tool } from '../tools/core/index.js'
 
 export function filterParentToolsForFork(parentTools: readonly Tool[]): Tool[] {
   return parentTools.filter(t => !ALL_AGENT_DISALLOWED_TOOLS.has(t.name))

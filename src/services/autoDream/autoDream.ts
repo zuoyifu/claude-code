@@ -22,7 +22,7 @@ import {
 } from '../../utils/messages.js'
 import type { Message } from '../../types/message.js'
 import { logForDebugging } from '../../utils/debug.js'
-import type { ToolUseContext } from '../../Tool.js'
+import type { ToolUseContext } from '../../tools/core/index.js'
 import { logEvent } from '../analytics/index.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../analytics/growthbook.js'
 import { isAutoMemoryEnabled, getAutoMemPath } from '../../memdir/paths.js'

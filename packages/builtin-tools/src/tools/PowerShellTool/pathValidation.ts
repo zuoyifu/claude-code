@@ -8,7 +8,7 @@
 
 import { homedir } from 'os'
 import { isAbsolute, resolve } from 'path'
-import type { ToolPermissionContext } from 'src/Tool.js'
+import type { ToolPermissionContext } from 'src/tools/core/index.js'
 import type { PermissionRule } from 'src/types/permissions.js'
 import { getCwd } from 'src/utils/cwd.js'
 import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'

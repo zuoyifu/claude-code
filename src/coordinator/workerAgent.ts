@@ -10,7 +10,7 @@
  * tools like TeamCreate/SendMessage) so they can research, implement,
  * and verify autonomously.
  */
-import { ASYNC_AGENT_ALLOWED_TOOLS } from '../constants/tools.js'
+import { ASYNC_AGENT_ALLOWED_TOOLS } from '../tools/registry/whitelists.js'
 import { SEND_MESSAGE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SendMessageTool/constants.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js'
 import { TEAM_CREATE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/TeamCreateTool/constants.js'

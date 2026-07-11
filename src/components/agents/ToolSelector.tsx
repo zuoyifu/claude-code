@@ -2,7 +2,7 @@ import figures from 'figures';
 import React, { useCallback, useMemo, useState } from 'react';
 import { mcpInfoFromString } from 'src/services/mcp/mcpStringUtils.js';
 import { isMcpTool } from 'src/services/mcp/utils.js';
-import type { Tool, Tools } from 'src/Tool.js';
+import type { Tool, Tools } from 'src/tools/core/index.js';
 import { filterToolsForAgent } from '@claude-code-best/builtin-tools/tools/AgentTool/agentToolUtils.js';
 import { AGENT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/AgentTool/constants.js';
 import { BashTool } from '@claude-code-best/builtin-tools/tools/BashTool/BashTool.js';

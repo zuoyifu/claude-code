@@ -1,5 +1,5 @@
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from 'src/Tool.js'
+import { buildTool, type ToolDef } from 'src/tools/core/index.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import type { PermissionResult } from 'src/utils/permissions/PermissionResult.js'
 import { isOutputLineTruncated } from 'src/utils/terminal.js'

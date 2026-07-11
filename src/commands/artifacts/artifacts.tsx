@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { LocalJSXCommandOnDone } from 'src/types/command.js';
-import type { ToolUseContext } from 'src/Tool.js';
+import type { ToolUseContext } from 'src/tools/core/index.js';
 import { ArtifactsMenu } from './ArtifactsMenu.js';
 import { extractArtifacts } from './scanner.js';
 

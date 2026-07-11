@@ -11,7 +11,7 @@ import * as React from 'react';
 import type { Command } from '../commands.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { Box } from '@anthropic/ink';
-import type { Tools } from '../Tool.js';
+import type { Tools } from '../tools/core/index.js';
 import { type ConnectorTextBlock, isConnectorTextBlock } from '../types/connectorText.js';
 import type {
   AssistantMessage,

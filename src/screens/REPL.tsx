@@ -205,7 +205,7 @@ const getCoordinatorUserContext: (
   : () => ({});
 /* eslint-enable custom-rules/no-process-env-top-level, @typescript-eslint/no-require-imports */
 import useCanUseTool from '../hooks/useCanUseTool.js';
-import type { ToolPermissionContext, Tool } from '../Tool.js';
+import type { ToolPermissionContext, Tool } from '../tools/core/index.js';
 import { notifyAutomationStateChanged } from '../utils/sessionState.js';
 import {
   applyPermissionUpdate,
@@ -286,7 +286,7 @@ import { randomUUID, type UUID } from 'crypto';
 import { processSessionStartHooks } from '../utils/sessionStart.js';
 import { executeSessionEndHooks, getSessionEndHookTimeoutMs } from '../utils/hooks.js';
 import { type IDESelection, useIdeSelection } from '../hooks/useIdeSelection.js';
-import { getTools, assembleToolPool } from '../tools.js';
+import { getTools, assembleToolPool } from '../tools/registry/assembler.js';
 import type { AgentDefinition } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
 import { resolveAgentTools } from '@claude-code-best/builtin-tools/tools/AgentTool/agentToolUtils.js';
 import { resumeAgentBackground } from '@claude-code-best/builtin-tools/tools/AgentTool/resumeAgent.js';
