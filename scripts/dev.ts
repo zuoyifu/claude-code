@@ -7,12 +7,16 @@
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getMacroDefines, DEFAULT_BUILD_FEATURES } from './defines.ts'
+import { generateCommandRegistry } from './generate-command-registry.ts'
 
 // Resolve project root from this script's location
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const projectRoot = join(__dirname, '..')
 const cliPath = join(projectRoot, 'src/entrypoints/cli.tsx')
+
+// Generate command registry before launching dev server
+await generateCommandRegistry()
 
 const defines = {
   ...getMacroDefines(),

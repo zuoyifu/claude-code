@@ -2,6 +2,7 @@ import { readdir, readFile, writeFile, cp } from 'fs/promises'
 import { join } from 'path'
 import { getMacroDefines } from './scripts/defines.ts'
 import { DEFAULT_BUILD_FEATURES } from './scripts/defines.ts'
+import { generateCommandRegistry } from './scripts/generate-command-registry.ts'
 
 const outdir = 'dist'
 
@@ -14,6 +15,10 @@ const envFeatures = Object.keys(process.env)
   .filter(k => k.startsWith('FEATURE_'))
   .map(k => k.replace('FEATURE_', ''))
 const features = [...new Set([...DEFAULT_BUILD_FEATURES, ...envFeatures])]
+
+// Step 1.5: Generate command registry before bundling
+await generateCommandRegistry()
+console.log('[build] command registry generated')
 
 // Step 2: Bundle with splitting
 const result = await Bun.build({
