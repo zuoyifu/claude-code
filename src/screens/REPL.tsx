@@ -266,7 +266,7 @@ import type {
   HookResultMessage,
   PartialCompactDirection,
 } from '../types/message.js';
-import { query } from '../query.js';
+import { query } from '../query/loop/production.js';
 import { mergeClients, useMergedClients } from '../hooks/useMergedClients.js';
 import { getQuerySourceForREPL } from '../utils/promptCategory.js';
 import { useMergedTools } from '../hooks/useMergedTools.js';

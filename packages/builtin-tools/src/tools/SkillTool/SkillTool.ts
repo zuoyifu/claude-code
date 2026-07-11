@@ -7,8 +7,8 @@ import {
   builtInCommandNames,
   findCommand,
   getCommands,
-  type PromptCommand,
-} from 'src/commands.js'
+} from 'src/commands/_registry/registry.js'
+import type { PromptCommand } from 'src/types/command.js'
 import type {
   Tool,
   ToolCallProgress,

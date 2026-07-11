@@ -38,6 +38,9 @@ jobs:
       - name: Type check
         run: bun run typecheck
 
+      - name: Architecture boundary check (dependency-cruiser)
+        run: bun run lint:deps:strict
+
       - name: Test with Coverage
         run: |
           # Tolerate pre-existing flaky tests (Bun mock pollution / order-dependent state).

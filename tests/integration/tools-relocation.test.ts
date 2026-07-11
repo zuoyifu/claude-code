@@ -74,6 +74,6 @@ describe('C1 tools relocation', () => {
     // P1 留的 _Tool placeholder 已在 Task 3 Step 7 替换
     const mod = await import('../../src/tools/registry/feature-gate.js')
     expect(typeof mod.isToolEnabled).toBe('function')
-    expect(typeof mod.loadFeatureGatedTool).toBe('function')
+    expect(typeof mod.loadFeatureGatedToolSync).toBe('function')
   })
 })

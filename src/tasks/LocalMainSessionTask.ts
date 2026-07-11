@@ -19,7 +19,8 @@ import {
   TASK_NOTIFICATION_TAG,
   TOOL_USE_ID_TAG,
 } from '../constants/xml.js'
-import { type QueryParams, query } from '../query.js'
+import { query } from '../query/loop/production.js'
+import type { QueryParams } from '../query/params.js'
 import { roughTokenCountEstimation } from '../services/tokenEstimation.js'
 import type { SetAppState } from '../Task.js'
 import { createTaskStateBase } from '../Task.js'

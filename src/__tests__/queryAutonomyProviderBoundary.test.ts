@@ -6,7 +6,7 @@ import {
   setOriginalCwd,
   setProjectRoot,
 } from '../bootstrap/state'
-import { query } from '../query'
+import { query } from '../query/loop/production'
 import { getEmptyToolPermissionContext } from '../tools/core/index.js'
 import type { AssistantMessage } from '../types/message'
 import { asSystemPrompt } from '../utils/systemPromptType'

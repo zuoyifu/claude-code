@@ -298,7 +298,7 @@ export function clearSkillIndexCache(): void {
 export async function getSkillIndex(cwd: string): Promise<SkillIndexEntry[]> {
   if (cachedIndex && cachedCwd === cwd) return cachedIndex
 
-  const { getCommands } = await import('../../commands.js')
+  const { getCommands } = await import('../../commands/_registry/registry.js')
   const commands = await getCommands(cwd)
 
   const entries: SkillIndexEntry[] = []

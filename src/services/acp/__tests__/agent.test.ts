@@ -44,7 +44,7 @@ afterAll(() => {
 const mockSetModel = mock(() => {})
 const mockSubmitMessage = mock(async function* (_input: string) {})
 
-mockModulePreservingExports('../../../QueryEngine.ts', {
+mockModulePreservingExports('../../../query/engine/QueryEngine.ts', {
   QueryEngine: class MockQueryEngine {
     submitMessage = mockSubmitMessage
     interrupt = mock(() => {})
@@ -190,7 +190,7 @@ const mockGetCommands = mock(async () => [
   },
 ])
 
-mockModulePreservingExports('../../../commands.ts', {
+mockModulePreservingExports('../../../commands/_registry/registry.ts', {
   getCommands: mockGetCommands,
 })
 

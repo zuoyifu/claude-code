@@ -13,6 +13,14 @@
   - 等待 dependency-cruiser 升级支持 TS 6.x，或
   - 在 CI 中以 glob 形式运行 `depcruise 'src/**/*.ts' --config`
 
+## 当前 baseline（F4 完成时）
+
+- 跑 `bun run lint:deps:strict` 退出码 0，零 warning，零 error。
+- 所有 v2 架构边界规则以 `severity: 'error'` 级别生效。
+- CI 在 Type check 后自动执行 `bun run lint:deps:strict`。
+- `precheck` 已包含 `lint:deps:strict`，本地开发即可捕获架构违规。
+- 任何 PR 引入违反 §3.2 分层约束的 import 都会被 CI 阻断。
+
 ## 规则演进计划
 
 | PR | 启用规则 | 预期 warning 变化 |
@@ -21,4 +29,4 @@
 | C2 完成 | feature-bundle-tool-boundary | tools/ 中的 feature() warning → 0 |
 | C7 完成 | cli-dispatcher-no-command-impl | cli 相关 warning → 0 |
 | C10 完成 | query-loop-no-engine / query-api-no-loop / query-engine-no-cli | query 相关 warning → 0 |
-| F4 | 全部 severity warn → error | 0 warning，违规即 CI fail |
+| F4 | 全部 severity warn → error | 0 warning，违规即 CI fail | **已完成** — 所有规则收紧为 error，CI 已集成 `lint:deps:strict` 步骤。退出码 0 验证通过。 |

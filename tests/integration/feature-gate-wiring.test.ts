@@ -106,10 +106,10 @@ describe('C2 feature-gate wiring', () => {
     expect(result).not.toBeInstanceOf(Promise)
   })
 
-  test('feature-gate 暴露核心 API（isToolEnabled/loadFeatureGatedTool/listEnabledFeatureGatedTools/validateFeatureGateFlags）', async () => {
+  test('feature-gate 暴露核心 API（isToolEnabled/loadFeatureGatedToolSync/listEnabledFeatureGatedTools/validateFeatureGateFlags）', async () => {
     const mod = await import('../../src/tools/registry/feature-gate.ts')
     expect(typeof mod.isToolEnabled).toBe('function')
-    expect(typeof mod.loadFeatureGatedTool).toBe('function')
+    expect(typeof mod.loadFeatureGatedToolSync).toBe('function')
     expect(typeof mod.listEnabledFeatureGatedTools).toBe('function')
     expect(typeof mod.validateFeatureGateFlags).toBe('function')
   })

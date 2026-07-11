@@ -35,7 +35,7 @@ mock.module('src/utils/model/model.js', () => ({
     return null
   },
 }))
-mock.module('src/commands.js', () => ({
+mock.module('src/commands/_registry/registry.js', () => ({
   getSkillToolCommands: async () => [],
 }))
 mock.module('src/constants/outputStyles.js', () => ({

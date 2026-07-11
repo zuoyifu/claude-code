@@ -23,27 +23,10 @@
 //    key) in parallel — isRemoteManagedSettingsEligible() otherwise reads them
 //    sequentially via sync spawn inside applySafeConfigEnvironmentVariables()
 //    (~65ms on every macOS startup)
-import {
-  profileCheckpoint,
-  profileReport,
-} from '../../utils/startupProfiler.js'
-
-import { startMdmRawRead } from '../../utils/settings/mdm/rawRead.js'
-
-import { startKeychainPrefetch } from '../../utils/secureStorage/keychainPrefetch.js'
+import { profileCheckpoint } from '../../utils/startupProfiler.js'
 
 import { feature } from 'bun:bundle'
-import {
-  Command as CommanderCommand,
-  Option,
-} from '@commander-js/extra-typings'
-import { createProgram } from '../program/index.js'
-import {
-  registerConditionalOptions,
-  registerGlobalOptions,
-} from '../program/options.js'
 import type { ProgramOptions } from '../program/types.js'
-import { registerAllSubcommands } from '../subcommands/index.js'
 import chalk from 'chalk'
 import { readFileSync } from 'fs'
 import mapValues from 'lodash-es/mapValues.js'
@@ -99,21 +82,15 @@ import { installAsciicastRecorder } from '../../utils/asciicast.js'
 import {
   getSubscriptionType,
   isClaudeAISubscriber,
-  prefetchAwsCredentialsAndBedRockInfoIfSafe,
-  prefetchGcpCredentialsIfSafe,
   validateForceLoginOrg,
 } from '../../utils/auth.js'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
   getRemoteControlAtStartup,
-  isAutoUpdaterDisabled,
   saveGlobalConfig,
 } from '../../utils/config.js'
-import {
-  seedEarlyInput,
-  stopCapturingEarlyInput,
-} from '../../utils/earlyInput.js'
+import { seedEarlyInput } from '../../utils/earlyInput.js'
 import {
   getInitialEffortSetting,
   parseEffortValue,
@@ -127,26 +104,17 @@ import {
 import { applyConfigEnvironmentVariables } from '../../utils/managedEnv.js'
 import { createSystemMessage, createUserMessage } from '../../utils/messages.js'
 import { getPlatform } from '../../utils/platform.js'
-import { getBaseRenderOptions } from '../../utils/renderOptions.js'
 import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
-import { settingsChangeDetector } from '../../utils/settings/changeDetector.js'
-import { skillChangeDetector } from '../../utils/skills/skillChangeDetector.js'
-import {
-  jsonParse,
-  writeFileSync_DEPRECATED,
-} from '../../utils/slowOperations.js'
+import { jsonParse } from '../../utils/slowOperations.js'
 import { computeInitialTeamContext } from '../../utils/swarm/reconnection.js'
-import { initializeWarningHandler } from '../../utils/warningHandler.js'
 import { isWorktreeModeEnabled } from '../../utils/worktreeModeEnabled.js'
 
-import { relative, resolve } from 'path'
-import { isAnalyticsDisabled } from 'src/services/analytics/config.js'
+import { resolve } from 'path'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from 'src/services/analytics/index.js'
-import { initializeAnalyticsGates } from 'src/services/analytics/sink.js'
 import {
   getOriginalCwd,
   setAdditionalDirectoriesForClaudeMd,
@@ -169,7 +137,6 @@ import {
   launchTeleportRepoMismatchDialog,
   launchTeleportResumeWrapper,
 } from '../../dialogLaunchers.js'
-import { SHOW_CURSOR } from '@anthropic/ink'
 import {
   exitWithError,
   exitWithMessage,
@@ -204,25 +171,13 @@ import {
   shouldAutoEnableClaudeInChrome,
   shouldEnableClaudeInChrome,
 } from '../../utils/claudeInChrome/setup.js'
-import { getContextWindowForModel } from '../../utils/context.js'
 import { loadConversationForResume } from '../../utils/conversationRecovery.js'
 import { buildDeepLinkBanner } from '../../utils/deepLink/banner.js'
-import {
-  hasNodeOption,
-  isBareMode,
-  isEnvTruthy,
-  isInProtectedNamespace,
-} from '../../utils/envUtils.js'
+import { isBareMode, isEnvTruthy } from '../../utils/envUtils.js'
 import { refreshExampleCommands } from '../../utils/exampleCommands.js'
 import type { FpsMetrics } from '../../utils/fpsTracker.js'
 import { getWorktreePaths } from '../../utils/getWorktreePaths.js'
-import {
-  findGitRoot,
-  getBranch,
-  getIsGit,
-  getWorktreeCount,
-} from '../../utils/git.js'
-import { getGhAuthStatus } from '../../utils/github/ghAuthStatus.js'
+import { getBranch } from '../../utils/git.js'
 import { safeParseJSON } from '../../utils/json.js'
 import { logError } from '../../utils/log.js'
 import { getModelDeprecationWarning } from '../../utils/model/deprecation.js'
@@ -244,10 +199,7 @@ import {
 } from '../../utils/permissions/permissionSetup.js'
 import { cleanupOrphanedPluginVersionsInBackground } from '../../utils/plugins/cacheUtils.js'
 import { initializeVersionedPlugins } from '../../utils/plugins/installedPluginsManager.js'
-import { getManagedPluginNames } from '../../utils/plugins/managedPlugins.js'
 import { getGlobExclusionsForPluginCache } from '../../utils/plugins/orphanedPluginFilter.js'
-import { getPluginSeedDirs } from '../../utils/plugins/pluginDirectories.js'
-import { countFilesRoundedRg } from '../../utils/ripgrep.js'
 import {
   processSessionStartHooks,
   processSetupHooks,
@@ -263,19 +215,10 @@ import {
 } from '../../utils/sessionStorage.js'
 import {
   getInitialSettings,
-  getManagedSettingsKeysForLogging,
-  getSettingsForSource,
   getSettingsWithErrors,
 } from '../../utils/settings/settings.js'
-import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
 import type { ValidationError } from '../../utils/settings/validation.js'
 import { DEFAULT_TASKS_MODE_TASK_LIST_ID } from '../../utils/tasks.js'
-import {
-  logPluginLoadErrors,
-  logPluginsEnabledForSession,
-} from '../../utils/telemetry/pluginTelemetry.js'
-import { logSkillsLoaded } from '../../utils/telemetry/skillLoadedEvent.js'
-import { generateTempFilePath } from '../../utils/tempfile.js'
 import { validateUuid } from '../../utils/uuid.js'
 // Plugin startup checks are now handled non-blockingly in REPL.tsx
 
@@ -296,14 +239,12 @@ import {
   excludeCommandsByServer,
   excludeResourcesByServer,
 } from 'src/services/mcp/utils.js'
-import { getRelevantTips } from 'src/services/tips/tipRegistry.js'
 import { logContextMetrics } from 'src/utils/api.js'
 import {
   CLAUDE_IN_CHROME_MCP_SERVER_NAME,
   isClaudeInChromeMCPServer,
 } from 'src/utils/claudeInChrome/common.js'
 import { registerCleanup } from 'src/utils/cleanupRegistry.js'
-import { eagerParseCliFlag } from 'src/utils/cliArgs.js'
 import { createEmptyAttributionState } from 'src/utils/commitAttribution.js'
 import {
   countConcurrentSessions,
@@ -319,59 +260,37 @@ import {
   TeleportOperationError,
   toError,
 } from 'src/utils/errors.js'
-import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js'
 import {
   gracefulShutdown,
   gracefulShutdownSync,
 } from 'src/utils/gracefulShutdown.js'
 import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js'
-import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js'
-import { peekForStdinData, writeToStderr } from 'src/utils/process.js'
+import { writeToStderr } from 'src/utils/process.js'
 import { setCwd } from 'src/utils/Shell.js'
 import {
   type ProcessedResume,
   processResumedConversation,
 } from 'src/utils/sessionRestore.js'
-import { parseSettingSourcesFlag } from 'src/utils/settings/constants.js'
 import { plural } from 'src/utils/stringUtils.js'
 import {
   type ChannelEntry,
   getInitialMainLoopModel,
   getIsNonInteractiveSession,
-  getSdkBetas,
   getSessionId,
   getUserMsgOptIn,
   setAllowedChannels,
-  setAllowedSettingSources,
   setChromeFlagOverride,
-  setClientType,
   setCwdState,
   setDirectConnectServerUrl,
-  setFlagSettingsPath,
   setInitialMainLoopModel,
-  setIsInteractive,
   setKairosActive,
   setOriginalCwd,
-  setQuestionPreviewFormat,
   setSdkBetas,
   setSessionBypassPermissionsMode,
   setSessionPersistenceDisabled,
-  setSessionSource,
   setUserMsgOptIn,
   switchSession,
 } from '../../bootstrap/state.js'
-
-// TeleportRepoMismatchDialog, TeleportResumeWrapper dynamically imported at call sites
-import { migrateBypassPermissionsAcceptedToSettings } from '../../migrations/migrateBypassPermissionsAcceptedToSettings.js'
-import { migrateEnableAllProjectMcpServersToSettings } from '../../migrations/migrateEnableAllProjectMcpServersToSettings.js'
-import { migrateFennecToOpus } from '../../migrations/migrateFennecToOpus.js'
-import { migrateLegacyOpusToCurrent } from '../../migrations/migrateLegacyOpusToCurrent.js'
-import { migrateOpusToOpus1m } from '../../migrations/migrateOpusToOpus1m.js'
-import { migrateReplBridgeEnabledToRemoteControlAtStartup } from '../../migrations/migrateReplBridgeEnabledToRemoteControlAtStartup.js'
-import { migrateSonnet1mToSonnet45 } from '../../migrations/migrateSonnet1mToSonnet45.js'
-import { migrateSonnet45ToSonnet46 } from '../../migrations/migrateSonnet45ToSonnet46.js'
-import { resetAutoModeOptInForDefaultOffer } from '../../migrations/resetAutoModeOptInForDefaultOffer.js'
-import { resetProToOpusDefault } from '../../migrations/resetProToOpusDefault.js'
 import { createRemoteSessionConfig } from '../../remote/RemoteSessionManager.js'
 /* eslint-enable @typescript-eslint/no-require-imports */
 // teleportWithProgress dynamically imported at call site
@@ -390,15 +309,12 @@ import { onChangeAppState } from '../../state/onChangeAppState.js'
 import { createStore } from '../../state/store.js'
 import { asSessionId } from '../../types/ids.js'
 import { filterAllowedSdkBetas } from '../../utils/betas.js'
-import { isInBundledMode, isRunningWithBun } from '../../utils/bundledMode.js'
+import { isInBundledMode } from '../../utils/bundledMode.js'
 import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
 import {
   filterExistingPaths,
   getKnownPathsForRepo,
 } from '../../utils/githubRepoPathMapping.js'
-import { loadAllPluginsCacheOnly } from '../../utils/plugins/pluginLoader.js'
-import { migrateChangelogFromConfig } from '../../utils/releaseNotes.js'
-import { SandboxManager } from '../../utils/sandbox/sandbox-adapter.js'
 import { fetchSession, prepareApiRequest } from '../../utils/teleport/api.js'
 import {
   checkOutTeleportedSessionBranch,
@@ -411,7 +327,7 @@ import {
   shouldEnableThinkingByDefault,
   type ThinkingConfig,
 } from '../../utils/thinking.js'
-import { initUser, resetUserCache } from '../../utils/user.js'
+import { resetUserCache } from '../../utils/user.js'
 import {
   getTmuxInstallInstructions,
   isTmuxAvailable,
@@ -434,7 +350,6 @@ import {
   logStartupTelemetry,
   logSessionTelemetry,
   logManagedSettings,
-  prefetchSystemContextIfSafe,
   getInputPrompt,
   extractTeammateOptions,
   _pendingConnect,

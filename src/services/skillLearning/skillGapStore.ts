@@ -491,7 +491,9 @@ function hash(value: string): string {
 
 async function clearRuntimeSkillCaches(): Promise<void> {
   try {
-    const { clearCommandsCache } = await import('../../commands.js')
+    const { clearCommandsCache } = await import(
+      '../../commands/_registry/registry.js'
+    )
     clearCommandsCache()
   } catch {
     // Best effort only; generated skill files are still available next process.

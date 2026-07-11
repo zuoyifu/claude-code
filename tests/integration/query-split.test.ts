@@ -4,10 +4,9 @@ import path from 'node:path'
 
 const SRC = path.resolve(process.cwd(), 'src/query')
 
-describe('C9 query split (Plan B: query.ts preserved as production source)', () => {
-  test('query.ts 保留（Plan B：生产 query() 函数不被新 queryLoop 骨架替换）', () => {
-    // Plan B: query.ts 保留作为薄包装层。新 query/loop/ 是并行骨架实现。
-    expect(existsSync(path.resolve(process.cwd(), 'src/query.ts'))).toBe(true)
+describe('C9 query split (Plan A complete: query.ts removed)', () => {
+  test('src/query.ts 已删除（Plan A 完成态：shim 移除，生产代码全部在 src/query/）', () => {
+    expect(existsSync(path.resolve(process.cwd(), 'src/query.ts'))).toBe(false)
   })
 
   test('query/ 目录含关键文件（骨架子模块）', () => {

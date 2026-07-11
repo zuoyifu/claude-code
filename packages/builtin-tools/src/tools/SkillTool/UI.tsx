@@ -4,7 +4,7 @@ import { SubAgentProvider } from 'src/components/CtrlOToExpand.js';
 import { FallbackToolUseErrorMessage } from 'src/components/FallbackToolUseErrorMessage.js';
 import { FallbackToolUseRejectedMessage } from 'src/components/FallbackToolUseRejectedMessage.js';
 import type { z } from 'zod/v4';
-import type { Command } from 'src/commands.js';
+import type { Command } from 'src/types/command.js';
 import { Byline } from '@anthropic/ink';
 import { Message as MessageComponent } from 'src/components/Message.js';
 import { MessageResponse } from 'src/components/MessageResponse.js';

@@ -1,12 +1,13 @@
-# 架构迁移设计：分层 + 注册器（方案 A）· v2
+# 架构迁移设计：分层 + 注册器（方案 A）· v3.1
 
 - **日期**：2026-07-11
-- **作者**：claude-code-best
-- **状态**：待实施
+- **状态**：部分已实施（C1/C2/C3+C8/C4/C5/C9/C10 完成；C6 按 Plan C-2 完成——runner.ts 单文件方案；C7 按 Plan C 调整——main.tsx 永久保留）
 - **范围**：`src/main.tsx` 拆分 + 工具系统统一 + 命令自动注册 + query/engine 拆分
 - **修订记录**：
   - **v1**（2026-07-11 初稿）：基础设计 6 节
   - **v2**（2026-07-11 同日）：根据 4 视角对抗审查 + verification agent 数据交叉核对，修正 3 个致命错误（F1-F3）、8 个高危项（H1-H8）、7 个中危项（M1-M7）、4 个低危改进（L1-L4），并校正行数估算（feature() 实际 214 文件、toolExecution.ts 实际 1831 行等）
+  - **v3**（2026-07-12）：根据 C6/C7 实施反馈与用户决策，新增 **Plan C：main.tsx 永久保留**。C6（dispatcher 拆分）已完成，dispatcher/runner.ts 承接 defaultAction；C7（bootstrap 迁出 + 删除 main.tsx）**不再执行**——main.tsx 作为永久运行时入口保留，cli.tsx 的延迟加载 `main.jsx` 模式正式化。修订 §3.1、§3.3.4、§6.4、§6.5、§9.2 C7、§9.3、§13.1 中所有"main.tsx 删除"表述。新增 §6.6 决策段落。
+  - **v3.1**（2026-07-12 同日追加）：新增 **Plan C-2：dispatcher/runner.ts 单文件方案**。正式承认 `cli/dispatcher/runner.ts`（3874 行）为永久方案，放弃 H2「10 子模块 × 200-400 行」拆分承诺。C6 实施产物为单文件 runner.ts + 12 个骨架子模块（各 33-96 行仅作类型/入口/小工具），不再要求把 runner.ts 强行拆到骨架子模块中。修订 §3.1、§6.1、§6.2、§6.5、§9.2 C6、§10.1、§11 中所有引用 H2「10 子模块」拆分承诺的段落。详见 §6.7。
 
 ## 0. v1 → v2 主要变更摘要
 
@@ -16,7 +17,7 @@
 | ☠️ F2 | feature() 散布规模 | 声称"10+ 处 → 1 处边界"，实际 **214 文件** 100+ 处调用 | **缩窄 feature-gate 边界 scope**：只覆盖**工具注册级**（约 15 处，可边界化）；UI/engine 中的**功能级**调用（REPL.tsx 70 处等）不在本设计范围 |
 | ☠️ F3 | entrypoints/cli.tsx 依赖约束 | §3.2 "不可依赖任何业务模块" vs §6.4 `program.action(handleDefaultAction)` 自相矛盾 | 放宽 §3.2：`cli.tsx` 可依赖 `cli/dispatcher`，删除"不可依赖任何业务模块"表述 |
 | 🔴 H1 | 生成器 yield 委托模式 | §7.4/§7.5 列 15 子模块未标返回类型与委托模式 | 为每个子模块明确标注：`AsyncGenerator`→`yield*`、`Promise<T>`→`await`、`boolean`→普通调用 |
-| 🔴 H2 | 90+ 闭包变量传递 | §6.2 `dispatcher/index.ts` 只展示协调函数，闭包变量打包有上帝对象陷阱 | 增加变量生命周期分组策略（启动期 / 请求期 / 全局），只跨模块传真正需要共享的 |
+| 🔴 H2 | 90+ 闭包变量传递 | §6.2 `dispatcher/index.ts` 只展示协调函数，闭包变量打包有上帝对象陷阱 | 增加变量生命周期分组策略（启动期 / 请求期 / 全局），只跨模块传真正需要共享的。**⚠️ v3.1 / Plan C-2 已废弃此策略**（见 §0.1、§6.7）：H2 拆分承诺被 runner.ts 单文件方案取代。 |
 | 🔴 H3 | 循环依赖 require() transimport | `tools.ts:69` 用 `require()` 打破循环，迁移后能否工作未验证 | 增加 **P0.5 前置步骤**：`bunx madge --circular src/` 绘制依赖图，C1 优先处理循环 |
 | 🔴 H4 | shim 双写窗口期 14 PR | 与 §9 "不留兼容期双写"承诺矛盾 | **缩短窗口期**：C2 完成后立即删 shim（不等 F1），窗口从 14 PR → 1 PR |
 | 🔴 H5 | getTools sync→async 影响面 | §12 "不改 React 组件" vs `getTools()` 影响 REPL.tsx、QueryEngine.ts | 放宽 §12：REPL.tsx 中 getTools 调用 + QueryEngine.ts（C10 本就要改）需要相应修改 |
@@ -36,6 +37,15 @@
 | 🔵 L4 | 生成器拆分无 MVP | 一次全量拆分风险高 | C9 前做 MVP（拆 1-2 个 yield 块验证） |
 | 数据 | 行数估算偏低 | toolExecution.ts 我说 700+，实际 1831 | 修正全表 |
 | 数据 | feature() 散布规模 | 我说 10+，实际 214 文件 | 修正所有提及处 |
+
+### 0.1 v3 / v3.1 架构决策追加（2026-07-12）
+
+本表仅记录 v2 之后的架构决策变更，详细理由见 §6.6（Plan C）与 §6.7（Plan C-2）。
+
+| 决策 | 影响 | 涉及章节 | 状态 |
+|------|------|---------|------|
+| **Plan C：main.tsx 永久保留**（v3） | C7 不再执行；main.tsx 不删除；cli.tsx 延迟加载 main.jsx 模式正式化；cli.tsx 行数上限放宽到 400 | §3.1、§3.3.4、§6.4、§6.5、§9.2 C7、§9.3、§13.1 | 已记录（§6.6） |
+| **Plan C-2：dispatcher/runner.ts 单文件方案**（v3.1） | H2「10 子模块 × 200-400 行」承诺废弃；C6 产物形态变更为 runner.ts（3874 行）+ 骨架子模块（各 33-96 行）；不再要求强行拆分 | §3.1、§6.1、§6.2、§6.5、§9.2 C6、§10.1、§11、§0 H2 行 | 已记录（§6.7） |
 
 ---
 
@@ -83,7 +93,7 @@ src/
 │   └── sdk/
 ├── cli/                         # 从 main.tsx 5640 行拆出
 │   ├── program/                 # Commander 实例 + 全局 option
-│   ├── dispatcher/              # 主 .action() 处理器（拆 10 子模块）
+│   ├── dispatcher/              # 主 .action() 处理器（v3.1 / Plan C-2：runner.ts 单文件 + 骨架子模块，详见 §6.7）
 │   ├── subcommands/             # CLI subcommand 注册（编译期生成 + 扫描）
 │   ├── bootstrap/               # 启动副作用集中点
 │   ├── fast-paths.ts            # 唯一 fast-paths 模块（含 bridge/daemon）
@@ -146,7 +156,7 @@ src/
 └── ...
 ```
 
-`src/main.tsx` 删除。
+`src/main.tsx` ~~删除~~ **永久保留**（v3 / Plan C 决策，详见 §6.6）。cli.tsx 通过延迟加载 `await import('../main.jsx')` 调用 `main()`，此模式正式化为运行时入口契约。
 
 ### 3.2 模块职责矩阵（边界契约）—— v2 修订
 
@@ -197,7 +207,7 @@ tools/execution  ← 依赖 registry、core、shared（不依赖 discovery、bui
    - 后续可单独发起"feature() 全局边界化"的 spec。
 2. **`cli/bootstrap/` 内允许少量 `feature()` 调用**——用于启动期决定是否初始化某个子系统（如 `DAEMON`、`BRIDGE_MODE`），不超过 5 处。
 3. `commands/<topic>/<name>/` 目录下的文件不得 import 同级其他命令的实现。
-4. `entrypoints/cli.tsx` 行数硬性上限 200。
+4. `entrypoints/cli.tsx` 行数上限：原 v2 定为 200 行硬性上限，**v3 放宽**（Plan C 决策，详见 §6.6）。当前 cli.tsx 363 行——延迟加载 `main.jsx` 模式 + fast-path 调度带来额外代码，超过原上限但有合理性。新上限：**400 行**。
 5. `query/` 三层强制单向依赖：`engine → loop → api`。不允许反向 import。
 6. **构建产物兼容性**（F1 新增）：所有"扫描"操作必须在 `build.ts` 编译期完成，生成静态 import 数组。运行时不允许 `globSync` + `require()` 模式。
 
@@ -569,6 +579,8 @@ export * from './tools/core/lookup.js'
 
 ## 6. `main.tsx` 5640 行拆分映射 —— v2 修订
 
+> **v3 注（2026-07-12）**：本章（§6.1–§6.5）描述的"main.tsx 全量拆分 + 删除"方案已被 **Plan C（§6.6）取代**——main.tsx 永久保留。本章保留作为**历史规划参考**与"若未来重启 main.tsx 拆分时的行号映射依据"。已实际交付的部分（subcommand 迁出 ~840 行、defaultAction 迁到 dispatcher/runner.ts、Commander 装配迁到 cli/program/、fast-paths 整合到 cli/fast-paths.ts）与本章规划一致；未交付的部分（bootstrap 迁到 cli/bootstrap/、main.tsx 删除）按 Plan C 不再执行。
+
 ### 6.1 行号 → 目标文件（M7 补充 cli.tsx 自身 fast-paths）
 
 | 当前位置 | 行数 | 重构后去处 |
@@ -581,7 +593,7 @@ export * from './tools/core/lookup.js'
 | `main.tsx` 743-1029 (`main()`) | ~286 | 拆三处：`cli/fast-paths.ts` + `entrypoints/cli.tsx` + `cli/dispatcher/index.ts` |
 | `main.tsx` 1030-1065 (`getInputPrompt`) | ~35 | `cli/dispatcher/prompt-input.ts` |
 | `main.tsx` 1066-1434 (Commander + preAction hook) | ~370 | `cli/program/index.ts` |
-| **`main.tsx` 1434-4464** (`.action()` 主处理器) | **~3030** | **`cli/dispatcher/` 10 子模块** |
+| **`main.tsx` 1434-4464** (`.action()` 主处理器) | **~3030** | **`cli/dispatcher/runner.ts` 单文件**（v3.1 / Plan C-2 决策，原 H2「10 子模块」承诺已废弃，详见 §6.7） |
 | `main.tsx` 4464-4613 (全局 option 链) | ~150 | `cli/program/options.ts` |
 | **`main.tsx` 4615-5455** (subcommand 链式注册) | **~840** | **完全删除**——`cli/subcommands/` 编译期生成 + 扫描 |
 | `main.tsx` 5459-5563 (`logTenguInit`) | ~105 | `cli/bootstrap/telemetry.ts` |
@@ -591,6 +603,8 @@ export * from './tools/core/lookup.js'
 | **`entrypoints/cli.tsx` 自身的 fast-paths**（M7 补充） | — | `cli/fast-paths.ts` 统一接管：`--version`、`--dump-system-prompt`、`--computer-use-mcp`、`--chrome-native-host`、`--daemon-worker`、`bridgeMain`、`daemonMain`、`remote-control`、`rc`、`remote`、`sync`、`bridge`、`daemon`、`ps`、`logs`、`attach`、`kill`、`--bg`、`new`、`list`、`reply`、`environment-runner`、`self-hosted-runner`、`--tmux`+`--worktree` |
 
 ### 6.2 `dispatcher/` 子模块拆分（H2 补充闭包变量分组策略）
+
+> **⚠️ v3.1 / Plan C-2 已替代本节承诺**（2026-07-12）：H2 原承诺「10 子模块 × 200-400 行」**已废弃**。实际实施产物为 `cli/dispatcher/runner.ts` 单文件（3874 行）+ 12 个骨架子模块（各 33-96 行，仅作类型/入口/小工具）。详见 §6.7。本节以下内容保留作为历史设计记录，不再作为实施目标。
 
 ```
 src/cli/dispatcher/
@@ -702,6 +716,8 @@ export function registerAllSubcommands(program: Command): void {
 
 ### 6.4 最终 `entrypoints/cli.tsx`（F3 修正：明确可依赖 dispatcher）
 
+> **v3 注**：本节展示的"cli.tsx 直接 `createProgram()` + `program.action(handleDefaultAction)`"形态为**目标形态参考**，当前不实施。按 §6.6 Plan C 决策，cli.tsx 维持延迟加载 `main.jsx` 的现有模式，main.tsx 永久保留。
+
 ```ts
 // src/entrypoints/cli.tsx
 // F3 放宽：cli.tsx 可依赖 cli/dispatcher（合理的根依赖）
@@ -737,10 +753,10 @@ main().catch(error => {
 | **拆分后**（细粒度方案） | |
 | `src/entrypoints/cli.tsx` | <200 |
 | `src/cli/program/{index,options}.ts` | ~350 |
-| `src/cli/dispatcher/*.ts` | ~10 文件 × 200-400 |
+| `src/cli/dispatcher/*.ts` | ~~10 文件 × 200-400~~ **runner.ts 单文件 3874 行 + 12 骨架子模块各 33-96 行**（v3.1 / Plan C-2，见 §6.7） |
 | `src/cli/subcommands/*.ts` | ~11 文件 × 50-150 |
 | `src/cli/bootstrap/*.ts` | ~5 文件 × 50-150 |
-| `src/main.tsx` | **删除** |
+| `src/main.tsx` | ~~删除~~ **永久保留**（v3 / Plan C，见 §6.6） |
 
 **L1 提供：中等粒度备选方案（5-8 文件）**
 
@@ -761,6 +777,125 @@ src/cli/
 - 中粒度（5-8 文件）：调用链清晰，单文件偏大、单测粒度变粗
 
 **默认采用细粒度方案**，但若实施中发现认知成本过高，可降级为中粒度（C6 后决策）。
+
+### 6.6 main.tsx 永久保留决策（Plan C，v3 / 2026-07-12）
+
+> **决策日期**：2026-07-12
+> **决策类型**：用户决策（选项 B：永久保留），取代 v2 §6.5、§9.2 C7、§9.3 F1 中"删除 main.tsx"的承诺。
+
+#### 6.6.1 决策内容
+
+`src/main.tsx` 作为**永久运行时入口**保留，不再改名、不再重组、不在本次重构范围内删除。`entrypoints/cli.tsx` 第 356 行的延迟加载模式正式化为运行时入口契约：
+
+```ts
+// src/entrypoints/cli.tsx (当前形态，363 行)
+// ...fast-path 调度...
+const { main: cliMain } = await import('../main.jsx');
+await cliMain();
+```
+
+此模式不再视为"Plan B 临时 shim"，而是 **Plan C 正式架构**。
+
+#### 6.6.2 理由
+
+1. **main.tsx 仍承载大量 bootstrap 副作用**：telemetry 初始化、settings 加载、MCP connect、prefetch 触发、trust dialog、logTenguInit 等启动期逻辑与 `main()` 函数耦合度高。强行迁出到 `cli/bootstrap/` 子目录（v2 §6.1 规划的 telemetry.ts / prefetch.ts / settings.ts / index.ts 共 5 文件）需要逐一拆解副作用顺序，迁移成本与回归风险均高于收益。
+2. **cli.tsx 363 行超原 spec §3.3.4 的 200 行上限，但延迟加载模式有合理性**：cli.tsx 承担 fast-path 调度（`--version`、`--computer-use-mcp`、bridge/daemon 等 20+ 快速路径）+ 延迟加载 main.jsx，这是 fast-path 优化（避免不必要的 main.tsx 加载），有真实的启动性能价值。v3 已将 §3.3.4 上限放宽到 400 行。
+3. **`cli/bootstrap/` 子目录创建推迟**：v2 §3.1 规划的 `cli/bootstrap/` 目录暂不创建。当前 `src/cli/dispatcher/bootstrap.ts`（93 行）暂时收纳部分 bootstrap 副作用，其余 bootstrap 逻辑仍留在 main.tsx 内部。未来如需进一步解耦，可单独发起 spec。
+
+#### 6.6.3 当前状态快照（2026-07-12）
+
+| 文件 / 目录 | v2 规划 | v3 实际状态 |
+|------------|---------|-----------|
+| `src/main.tsx` | 删除 | **永久保留**，当前 1615 行（subcommand 链已迁出，defaultAction 已迁到 dispatcher/runner.ts） |
+| `src/entrypoints/cli.tsx` | <200 行最终形态 | 363 行，延迟加载 main.jsx 模式正式化 |
+| `src/cli/dispatcher/` | 10 子模块 | **已创建**（含 bootstrap.ts、runner.ts + 12 骨架子模块 = 13 文件） |
+| `src/cli/bootstrap/` | 5 文件 | **未创建**，推迟到未来需要时 |
+| `src/cli/program/` | index.ts + options.ts | **已创建** |
+| `src/cli/subcommands/` | 11 文件 | **已创建** |
+| `src/cli/fast-paths.ts` | 统一 fast-path | **已创建** |
+
+#### 6.6.4 修订影响
+
+本决策修订以下章节（详见各章节内联标注）：
+- §3.1（目标目录树末尾）：`main.tsx` 从"删除"改为"永久保留"
+- §3.3.4（cli.tsx 行数上限）：从 200 行放宽到 400 行
+- §6.4（最终 cli.tsx 形态）：保留为**目标形态参考**，当前不实施（cli.tsx 继续延迟加载 main.jsx）
+- §6.5（拆分前后对比）：`main.tsx` 行标注为"永久保留"
+- §9.2 C7（bootstrap 迁出 + 删除 main.tsx）：**不再执行**
+- §9.3 F1（确认 shim 删除）：main.tsx 不在 shim 删除范围
+- §11（风险）："`main.tsx` 拆分丢失副作用顺序"风险**降级为低**（不再拆分）
+- §13.1（量化收益）：`main.tsx` 5640→0 修正为 5640→1615（subcommand 已迁出）
+
+#### 6.6.5 不变的部分
+
+C6（dispatcher 拆分）已完成且**不受本决策影响**：`src/cli/dispatcher/` 下 13 个子模块（含 runner.ts 承接原 `main()` 的 defaultAction 协调逻辑、bootstrap.ts 收纳 93 行 bootstrap 副作用）作为已交付成果保留。main.tsx 保留不等于回退 dispatcher 拆分。
+
+### 6.7 dispatcher/runner.ts 单文件方案（Plan C-2，v3.1 / 2026-07-12）
+
+> **决策日期**：2026-07-12
+> **决策类型**：用户决策（选项 B：在 spec 中追加 Plan C-2 承认现状），取代 H2「10 子模块 × 200-400 行」拆分承诺。
+> **关联**：本决策与 §6.6 的 Plan C（main.tsx 永久保留）相互独立——§6.6 决定 main.tsx 不删，本决策决定 dispatcher/runner.ts 不再强行拆分。两者共同构成 v3 架构调整。
+
+#### 6.7.1 决策内容
+
+承认 `src/cli/dispatcher/runner.ts`（**3874 行**）的**单文件形态为永久方案**，放弃 H2「把 defaultAction 主体拆到 `cli/dispatcher/` 下 10 个 200-400 行子模块」的承诺。runner.ts 是 C6.5 迁移产物，承接原 `main.tsx` 1069-4083 行（约 3014 行）的 defaultAction 主体，并因实际增长达到 3874 行。
+
+**保留 `cli/dispatcher/` 下现有骨架子模块**（不再要求把 runner.ts 强行拆到它们中）：
+
+| 子模块 | 实际行数 | 实际职责 |
+|--------|---------|---------|
+| `runner.ts` | **3874** | defaultAction 完整实现（永久单文件） |
+| `types.ts` | 96 | 类型声明 |
+| `bootstrap.ts` | 93 | bootstrap 副作用片段 |
+| `options-normalizer.ts` | 81 | option 归一化 |
+| `headless.ts` | 80 | headless 模式入口 |
+| `fast-paths.ts` | 75 | fast-path 片段 |
+| `session-restore.ts` | 65 | session 恢复入口 |
+| `modes.ts` | 56 | 模式切换 |
+| `permissions.ts` | 62 | 权限设置入口 |
+| `repl.ts` | 41 | REPL 启动入口 |
+| `index.ts` | 44 | 模块入口/re-export |
+| `teammate-options.ts` | 62 | teammate option 提取 |
+| `prompt-input.ts` | 33 | prompt 输入辅助 |
+
+骨架子模块各仅 33-96 行（远低于 H2 承诺的 200-400 行），仅承担类型声明、入口 re-export、小工具函数等辅助职责；defaultAction 的实际主逻辑全部集中在 runner.ts。
+
+#### 6.7.2 理由
+
+1. **3874 行单文件运行良好，precheck 通过**：runner.ts 作为 C6.5 迁移产物，行为与原 `main.tsx` defaultAction 1:1 等价（所有 `process.exit`、所有分支、所有闭包变量原样保留）。`bun run precheck`（typecheck + lint fix + test）零错误通过。当前没有功能性问题需要通过拆分来修复。
+
+2. **拆分工作量大且高风险**（重构核心 CLI 入口）：runner.ts 的 `runner.ts:1-13` 注释自承"defaultAction 有 5 个跨阶段闭包依赖，拆分会改变行为"。defaultAction 是 CLI 的核心入口路径，包含 options 归一化 → bootstrap 副作用 → 权限设置 → session 恢复 → headless/REPL 分发等阶段，阶段间通过闭包变量共享状态。强行按 H2 的 DispatcherContext 模式重构需要：(a) 识别所有跨阶段闭包变量；(b) 设计 context 对象并验证字段数 ≤ 20；(c) 逐阶段迁移并保持行为等价。任一步骤出错都可能导致 CLI 启动回归，而 CLI 启动失败是 P0 级事故。
+
+3. **骨架子模块化探索已证明收益不及成本**：C6 实施时已经按 H2 的方向创建了 12 个骨架子模块（options-normalizer.ts、bootstrap.ts、permissions.ts、session-restore.ts、headless.ts、repl.ts、modes.ts、prompt-input.ts、teammate-options.ts、fast-paths.ts、index.ts、types.ts 等），但探索结果显示：defaultAction 主体的跨阶段闭包依赖使得"把主逻辑搬进骨架子模块"变得不安全，骨架子模块只能承担小工具/入口/re-export 职责（因此各仅 33-96 行）。继续强行拆分的边际收益（可单测性提升）不足以抵消边际成本（回归风险 + 工程时间）。
+
+4. **H2 的上帝对象担忧实际未 materialize**：H2 原本担心"闭包变量打包有上帝对象陷阱"。但 runner.ts 采用的是**闭包变量原地保留**的方式（而非打包成 DispatcherContext 对象传递），规避了上帝对象问题。代价是 runner.ts 作为单文件承载所有闭包——但这是一个已知的、可控的权衡，而非 H2 担忧的隐性陷阱。
+
+#### 6.7.3 修订影响
+
+本决策修订以下章节（详见各章节内联标注）：
+- §3.1（目标目录树）：`cli/dispatcher/` 注释从"拆 10 子模块"改为"runner.ts 单文件 + 骨架子模块"
+- §6.1（行号映射）：`.action()` 主处理器去向从"10 子模块"改为"`cli/dispatcher/runner.ts` 单文件"
+- §6.2（dispatcher 子模块拆分）：H2 闭包变量分组策略标注为**已废弃的历史设计记录**
+- §6.5（拆分前后对比）：`dispatcher/*.ts` 行数从"10 文件 × 200-400"改为实际值
+- §9.2 C6（3000 行 .action() 拆分）：标注为**已按 Plan C-2 完成**（产物形态与原承诺不同）
+- §10.1（测试策略）：`cli/dispatcher/` 集成测试目标调整为"runner.ts 各分支"
+- §11（风险）：H2 相关的"闭包变量传递"与"拆分丢失副作用顺序"风险**降级**（不再拆分）
+
+#### 6.7.4 不变的部分
+
+- `cli/dispatcher/` 目录及其下 13 个文件（runner.ts + 12 骨架子模块）**全部保留**，不删除、不重组合。
+- 骨架子模块现有的小工具/入口/re-export 职责不变。未来如发现某个骨架子模块可以承接 runner.ts 的某个独立片段（且无跨阶段闭包依赖），允许渐进式迁移——但这不是 spec 要求，而是 opportunistic 改进。
+- H1（query/loop/engine 三层单向依赖）、F1-F3、H3-H8（除 H2 外）等其他设计约束**不受本决策影响**。
+- main.tsx Plan C（§6.6）与本决策相互独立，两者不冲突。
+
+#### 6.7.5 未来触发条件
+
+如果以下任一情况发生，可重新评估是否拆分 runner.ts：
+1. runner.ts 行数增长超过 **5000 行**（当前 3874 行，阈值留 30% 缓冲）。
+2. 出现需要独立单测 defaultAction 某个阶段的需求，且该阶段无跨阶段闭包依赖。
+3. CLI 启动路径出现 bug，根因分析指向 runner.ts 的单文件形态（即"文件过大导致认知负担"成为直接原因）。
+
+在以上条件未触发前，runner.ts 单文件方案为最终方案，不再发起拆分 spec。
 
 ## 7. `query/` + `engine/` 拆分 —— v2 修订（H1 重点）
 
@@ -1093,8 +1228,8 @@ loop/tool-dispatch.ts → runToolUse(toolName, input)
 | **C3+C8 合并**（H8） | 创建 `src/commands/_registry/`，启用 `generated.ts` 替代 `commands.ts` 中央数组。**同时**把 144 个目录搬到主题分组（含 M5 的 `session/`→`session-info/` 重命名）。`git mv` + 改 import 路径 + 加 category（路径推导）。 | C1（H6 修正：原 C3→C1 虚假依赖已移除） | ~144 git mv + ~300 行改路径 |
 | **C4** | 创建 `src/cli/program/`，把 `main.tsx` 的 Commander 创建 + preAction hook + 全局 option 链迁入。 | C3（H6 修正：原 C4→C2 虚假依赖移除） | ~700 行 |
 | C5 | 把 `main.tsx` 的 840 行 subcommand 链迁到 `cli/subcommands/` 静态 import 模式。 | C4 | ~900 行 |
-| **C6**（H7 高风险） | 把 `main.tsx` 的 3000 行 `.action()` 拆到 `cli/dispatcher/` 10 子模块。**按 H2 闭包变量分组策略执行**。 | C5 | ~3000 行 |
-| C7 | 把 `main.tsx` 剩余 bootstrap 函数迁到 `cli/bootstrap/`。`main.tsx` 删除，`cli.tsx` 改最终形态（含 M7 的 fast-paths 整合）。 | C6 | ~400 行 + 删除 |
+| **C6**（H7 高风险） | ~~把 `main.tsx` 的 3000 行 `.action()` 拆到 `cli/dispatcher/` 10 子模块。按 H2 闭包变量分组策略执行。~~ **v3.1 / Plan C-2：产物形态变更**——已迁移为 `cli/dispatcher/runner.ts` 单文件（3874 行）+ 12 骨架子模块（各 33-96 行），不再强行按 H2 拆到 200-400 行子模块。详见 §6.7。 | C5 | ~3000 行（已实施，形态与原承诺不同） |
+| C7 | ~~把 `main.tsx` 剩余 bootstrap 函数迁到 `cli/bootstrap/`。`main.tsx` 删除，`cli.tsx` 改最终形态（含 M7 的 fast-paths 整合）。~~ **v3/Plan C：不再执行**——main.tsx 永久保留，详见 §6.6。`cli/bootstrap/` 子目录创建推迟。当前 `cli/dispatcher/bootstrap.ts`（93 行）收纳部分 bootstrap 副作用。 | C6 | ~~~400 行 + 删除~~ 0 行（决策变更） |
 | **C9**（H7 可与 C6/C7/C8 并行的 fallback 路径） | 把 `src/query.ts` 2057 行拆到 `query/api.ts` + `stream/` + `loop/`。**L4 前置：先做 MVP**（拆 1-2 个 yield 块验证委托模式）→ 全量拆分。原文件改 shim 并在同 PR 删除。 | C2（不依赖 C6/C7/C8） | ~2000 行 |
 | C10 | 把 `src/QueryEngine.ts` 拆到 `query/engine/`。H1 明确 9 个子模块的 yield 委托模式。删除原文件。 | C9 | ~1400 行 |
 
@@ -1121,7 +1256,7 @@ P0.5 → C1+C2 ─→ C9 → C10  （与 C3-C7 并行）
 
 | # | 内容 |
 |---|------|
-| F1 | 确认所有 shim 已在 C1/C2/C9 删除；`bun run check:unused` 验证外部无残留旧路径 import |
+| F1 | 确认所有 shim 已在 C1/C2/C9 删除；`bun run check:unused` 验证外部无残留旧路径 import。**v3 注**：`src/main.tsx` 不在 shim 删除范围（Plan C 永久保留，见 §6.6）。**v3.2 注**（2026-07-12）：`src/query.ts`、`src/QueryEngine.ts`、`src/commands.ts` 三个 re-export shim 已于本次审查跟进中删除（外部 import 已切换至 `src/query/loop/production.js`、`src/query/engine/QueryEngine.js`、`src/commands/_registry/registry.js`）。`tests/integration/no-legacy-paths.test.ts` 的相关断言已同步更新。 |
 | F2 | 清理 tsconfig.json 过时配置 |
 | F3 | 更新 CLAUDE.md 架构章节 |
 | F4 | `dependency-cruiser` 收紧为 error |
@@ -1145,7 +1280,7 @@ P0.5 → C1+C2 ─→ C9 → C10  （与 C3-C7 并行）
 | `tools/discovery/` | 单元 | TF-IDF、prefetch |
 | `commands/_registry/` | 单元 | scanner 生成代码正确、registry 过滤 |
 | `commands/_registry/scanner.ts` | 单元 | 不同目录布局下的扫描结果 |
-| `cli/dispatcher/` | 集成 | action 各分支、bootstrap 副作用顺序 |
+| `cli/dispatcher/` | 集成 | runner.ts 的 action 各分支、bootstrap 副作用顺序（v3.1 / Plan C-2：测试目标改为 runner.ts 单文件，见 §6.7） |
 | `cli/subcommands/` | 单元 | 每个 `define()` 注册正确 |
 | `query/api.ts` | 单元 | 流解码（mock SDK） |
 | `query/loop/` | 单元 + 集成 | 主循环协调、yield* 委托正确（H1 重点） |
@@ -1166,7 +1301,7 @@ P0.5 → C1+C2 ─→ C9 → C10  （与 C3-C7 并行）
 |------|--------|------|
 | ~~`feature()` 替换漏改~~（F2 scope 缩窄后）| 中（v1 高） | biome lint 强制 `bun:bundle` 在 `tools/registry/feature-gate.ts` 之外只允许出现在已知 UI/engine 调用点白名单 |
 | 工具注册同步→async 导致调用方漏 await | 高 | C2 全项目搜索 + tsc 严格检查；H5 强制修改 REPL.tsx 和 QueryEngine.ts |
-| `main.tsx` 拆分丢失副作用顺序（telemetry/settings） | 高 | C6/C7 保留"启动顺序断言"——ordered log 验证 |
+| `main.tsx` 拆分丢失副作用顺序（telemetry/settings） | ~~高~~ **低（v3）** | ~~C6/C7 保留"启动顺序断言"——ordered log 验证~~ **v3/Plan C：不再拆分 main.tsx**（见 §6.6），风险自然消除。dispatcher/runner.ts 接管 defaultAction 时已验证副作用顺序。 |
 | 144 个目录搬家 git history 丢失 | 中 | 全部 `git mv`，blame 可追溯 |
 | React Compiler `_c()` 样板在 move 时被 biome 破坏 | 中 | ignored patterns 保持；C1-C10 不动 components/ |
 | 自动扫描启动时间增加 | 低 | F1 改为编译期生成后，零运行时开销 |
@@ -1174,7 +1309,7 @@ P0.5 → C1+C2 ─→ C9 → C10  （与 C3-C7 并行）
 | **F1 构建产物兼容性**（v1 完全没考虑） | 极高 | 编译期代码生成方案；C1-C10 每步都跑 `bun run build` + `bun run build:vite` 验证 |
 | **H1 生成器 yield 委托错误**（静默丢事件/死循环） | 极高 | L4 MVP 强制 + biome lint 检测 `yield*` 模式 |
 | **H3 循环依赖 require() 迁移后失效** | 高 | P0.5 前置调研，C1 优先处理 |
-| **H7 C6 单点阻塞** | 高 | Plan B：C9/C10 并行路径 |
+| **H7 C6 单点阻塞** | ~~高~~ **已解除（v3.1）** | ~~Plan B：C9/C10 并行路径~~ **C6 已按 Plan C-2 完成**（runner.ts 单文件，见 §6.7），单点阻塞风险消除。C9/C10 也已独立完成。 |
 
 ### 11.1 回滚预案
 
@@ -1201,7 +1336,7 @@ P0.5 → C1+C2 ─→ C9 → C10  （与 C3-C7 并行）
 
 | 指标 | 拆分前 | 拆分后 |
 |------|--------|--------|
-| `src/main.tsx` | 5640 行 | 0（删除） |
+| `src/main.tsx` | 5640 行 | ~~0（删除）~~ **1615 行（v3/Plan C 永久保留，见 §6.6）**。subcommand 链（~840 行）、defaultAction 协调逻辑已迁出，main.tsx 瘦身 ~4025 行。 |
 | `src/query.ts` + `src/QueryEngine.ts` | 3422 行（2 文件） | ~3400 行（22 文件，平均 155 行） |
 | `src/Tool.ts` + `src/tools.ts` + `src/constants/tools.ts` | 1403 行（3 文件） | ~1400 行（5 个 `tools/` 子目录） |
 | `src/services/tools/` | 3263 行（4 文件） | ~3300 行（`tools/execution/` 8 文件） |

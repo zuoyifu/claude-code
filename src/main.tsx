@@ -22,89 +22,27 @@ import { startKeychainPrefetch } from './utils/secureStorage/keychainPrefetch.js
 startKeychainPrefetch();
 
 import { feature } from 'bun:bundle';
-import { Command as CommanderCommand, Option } from '@commander-js/extra-typings';
+import { Command as CommanderCommand } from '@commander-js/extra-typings';
 import { createProgram } from './cli/program/index.js';
 import { registerConditionalOptions, registerGlobalOptions } from './cli/program/options.js';
-import type { ProgramOptions } from './cli/program/types.js';
 import { registerAllSubcommands } from './cli/subcommands/index.js';
 import { handleDefaultAction } from './cli/dispatcher/index.js';
 import chalk from 'chalk';
 import { readFileSync } from 'fs';
-import mapValues from 'lodash-es/mapValues.js';
-import pickBy from 'lodash-es/pickBy.js';
-import uniqBy from 'lodash-es/uniqBy.js';
-import { getOauthConfig } from './constants/oauth.js';
-import { getRemoteSessionUrl } from './constants/product.js';
 import { getSystemContext, getUserContext } from './context.js';
-import { initializeTelemetryAfterTrust } from './entrypoints/init.js';
-import { addToHistory } from './history.js';
-import type { Root } from '@anthropic/ink';
-import { launchRepl } from './replLauncher.js';
-import {
-  hasGrowthBookEnvOverride,
-  initializeGrowthBook,
-  refreshGrowthBookAfterAuthChange,
-} from './services/analytics/growthbook.js';
-import { fetchBootstrapData } from './services/api/bootstrap.js';
-import {
-  type DownloadResult,
-  downloadSessionFiles,
-  type FilesApiConfig,
-  parseFileSpecs,
-} from './services/api/filesApi.js';
-import { prefetchPassesEligibility } from './services/api/referral.js';
-import type { McpSdkServerConfig, McpServerConfig, ScopedMcpServerConfig } from './services/mcp/types.js';
-import { isPolicyAllowed, refreshPolicyLimits, waitForPolicyLimitsToLoad } from './services/policyLimits/index.js';
-import { refreshRemoteManagedSettings } from './services/remoteManagedSettings/index.js';
-import type { ToolInputJSONSchema } from './tools/core/index.js';
-import {
-  createSyntheticOutputTool,
-  isSyntheticOutputToolEnabled,
-} from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js';
-import { getTools } from './tools/registry/assembler.js';
-import {
-  canUserConfigureAdvisor,
-  getInitialAdvisorSetting,
-  isAdvisorEnabled,
-  isValidAdvisorModel,
-  modelSupportsAdvisor,
-} from './utils/advisor.js';
-import { isAgentSwarmsEnabled } from './utils/agentSwarmsEnabled.js';
-import { count, uniq } from './utils/array.js';
-import { installAsciicastRecorder } from './utils/asciicast.js';
-import {
-  getSubscriptionType,
-  isClaudeAISubscriber,
-  prefetchAwsCredentialsAndBedRockInfoIfSafe,
-  prefetchGcpCredentialsIfSafe,
-  validateForceLoginOrg,
-} from './utils/auth.js';
+import { prefetchAwsCredentialsAndBedRockInfoIfSafe, prefetchGcpCredentialsIfSafe } from './utils/auth.js';
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
-  getRemoteControlAtStartup,
   isAutoUpdaterDisabled,
   saveGlobalConfig,
 } from './utils/config.js';
-import { seedEarlyInput, stopCapturingEarlyInput } from './utils/earlyInput.js';
-import { getInitialEffortSetting, parseEffortValue } from './utils/effort.js';
-import {
-  getInitialFastModeSetting,
-  isFastModeEnabled,
-  prefetchFastModeStatus,
-  resolveFastModeStatusFromCache,
-} from './utils/fastMode.js';
-import { applyConfigEnvironmentVariables } from './utils/managedEnv.js';
-import { createSystemMessage, createUserMessage } from './utils/messages.js';
-import { getPlatform } from './utils/platform.js';
+import { stopCapturingEarlyInput } from './utils/earlyInput.js';
 import { getBaseRenderOptions } from './utils/renderOptions.js';
-import { getSessionIngressAuthToken } from './utils/sessionIngressAuth.js';
 import { settingsChangeDetector } from './utils/settings/changeDetector.js';
 import { skillChangeDetector } from './utils/skills/skillChangeDetector.js';
-import { jsonParse, writeFileSync_DEPRECATED } from './utils/slowOperations.js';
-import { computeInitialTeamContext } from './utils/swarm/reconnection.js';
+import { writeFileSync_DEPRECATED } from './utils/slowOperations.js';
 import { initializeWarningHandler } from './utils/warningHandler.js';
-import { isWorktreeModeEnabled } from './utils/worktreeModeEnabled.js';
 
 // Lazy require to avoid circular dependency: teammate.ts -> AppState.tsx -> ... -> main.tsx
 // Exported for dispatcher/runner.ts (C6.5 migration).
@@ -132,182 +70,60 @@ export const kairosGate = feature('KAIROS')
   ? (require('./assistant/gate.js') as typeof import('./assistant/gate.js'))
   : null;
 
-import { relative, resolve } from 'path';
+import { relative } from 'path';
 import { isAnalyticsDisabled } from 'src/services/analytics/config.js';
-import { getFeatureValue_CACHED_MAY_BE_STALE } from 'src/services/analytics/growthbook.js';
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from 'src/services/analytics/index.js';
 import { initializeAnalyticsGates } from 'src/services/analytics/sink.js';
-import {
-  getOriginalCwd,
-  setAdditionalDirectoriesForClaudeMd,
-  setIsRemoteMode,
-  setMainLoopModelOverride,
-  setMainThreadAgentType,
-  setTeleportedSessionInfo,
-} from './bootstrap/state.js';
-import { filterCommandsForRemoteMode, getCommands } from './commands/_registry/registry.js';
-import type { StatsStore } from './context/stats.js';
-import {
-  launchAssistantInstallWizard,
-  launchAssistantSessionChooser,
-  launchInvalidSettingsDialog,
-  launchResumeChooser,
-  launchSnapshotUpdateDialog,
-  launchTeleportRepoMismatchDialog,
-  launchTeleportResumeWrapper,
-} from './dialogLaunchers.js';
+import { getOriginalCwd } from './bootstrap/state.js';
 import { SHOW_CURSOR } from '@anthropic/ink';
-import {
-  exitWithError,
-  exitWithMessage,
-  getRenderContext,
-  renderAndRun,
-  showSetupScreens,
-} from './interactiveHelpers.js';
-import { initBuiltinPlugins } from './plugins/bundled/index.js';
-/* eslint-enable @typescript-eslint/no-require-imports */
-import { checkQuotaStatus } from './services/claudeAiLimits.js';
-import { getMcpToolsCommandsAndResources, prefetchAllMcpResources } from './services/mcp/client.js';
-import { initBundledSkills } from './skills/bundled/index.js';
-import type { AgentColorName } from '@claude-code-best/builtin-tools/tools/AgentTool/agentColorManager.js';
-import {
-  getActiveAgentsFromList,
-  getAgentDefinitionsWithOverrides,
-  isBuiltInAgent,
-  isCustomAgent,
-  parseAgentsFromJson,
-} from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js';
-import type { LogOption } from './types/logs.js';
-import type { Message as MessageType } from './types/message.js';
-import {
-  CLAUDE_IN_CHROME_SKILL_HINT,
-  CLAUDE_IN_CHROME_SKILL_HINT_WITH_WEBBROWSER,
-} from './utils/claudeInChrome/prompt.js';
-import {
-  setupClaudeInChrome,
-  shouldAutoEnableClaudeInChrome,
-  shouldEnableClaudeInChrome,
-} from './utils/claudeInChrome/setup.js';
 import { getContextWindowForModel } from './utils/context.js';
-import { loadConversationForResume } from './utils/conversationRecovery.js';
-import { buildDeepLinkBanner } from './utils/deepLink/banner.js';
 import { hasNodeOption, isBareMode, isEnvTruthy, isInProtectedNamespace } from './utils/envUtils.js';
-import { refreshExampleCommands } from './utils/exampleCommands.js';
-import type { FpsMetrics } from './utils/fpsTracker.js';
-import { getWorktreePaths } from './utils/getWorktreePaths.js';
-import { findGitRoot, getBranch, getIsGit, getWorktreeCount } from './utils/git.js';
+import { findGitRoot, getIsGit, getWorktreeCount } from './utils/git.js';
 import { getGhAuthStatus } from './utils/github/ghAuthStatus.js';
 import { safeParseJSON } from './utils/json.js';
 import { logError } from './utils/log.js';
-import { getModelDeprecationWarning } from './utils/model/deprecation.js';
-import {
-  getDefaultMainLoopModel,
-  getUserSpecifiedModelSetting,
-  normalizeModelStringForAPI,
-  parseUserSpecifiedModel,
-} from './utils/model/model.js';
-import { ensureModelStringsInitialized } from './utils/model/modelStrings.js';
-import {
-  initializeToolPermissionContext,
-  initialPermissionModeFromCLI,
-  isDefaultPermissionModeAuto,
-  parseToolListFromCLI,
-  removeDangerousPermissions,
-  stripDangerousPermissionsForAutoMode,
-  verifyAutoModeGateAccess,
-} from './utils/permissions/permissionSetup.js';
-import { cleanupOrphanedPluginVersionsInBackground } from './utils/plugins/cacheUtils.js';
-import { initializeVersionedPlugins } from './utils/plugins/installedPluginsManager.js';
+import { getDefaultMainLoopModel, parseUserSpecifiedModel } from './utils/model/model.js';
 import { getManagedPluginNames } from './utils/plugins/managedPlugins.js';
-import { getGlobExclusionsForPluginCache } from './utils/plugins/orphanedPluginFilter.js';
 import { getPluginSeedDirs } from './utils/plugins/pluginDirectories.js';
 import { countFilesRoundedRg } from './utils/ripgrep.js';
-import { processSessionStartHooks, processSetupHooks } from './utils/sessionStart.js';
-import {
-  cacheSessionTitle,
-  getSessionIdFromLog,
-  loadTranscriptFromFile,
-  saveAgentSetting,
-  saveMode,
-  searchSessionsByCustomTitle,
-  sessionIdExists,
-} from './utils/sessionStorage.js';
 import {
   getInitialSettings,
   getManagedSettingsKeysForLogging,
   getSettingsForSource,
-  getSettingsWithErrors,
 } from './utils/settings/settings.js';
 import { resetSettingsCache } from './utils/settings/settingsCache.js';
-import type { ValidationError } from './utils/settings/validation.js';
-import { DEFAULT_TASKS_MODE_TASK_LIST_ID } from './utils/tasks.js';
 import { logPluginLoadErrors, logPluginsEnabledForSession } from './utils/telemetry/pluginTelemetry.js';
 import { logSkillsLoaded } from './utils/telemetry/skillLoadedEvent.js';
 import { generateTempFilePath } from './utils/tempfile.js';
 import { validateUuid } from './utils/uuid.js';
 // Plugin startup checks are now handled non-blockingly in REPL.tsx
 
-import { logPermissionContextForAnts } from 'src/services/internalLogging.js';
-import { fetchClaudeAIMcpConfigsIfEligible } from 'src/services/mcp/claudeai.js';
-import { clearServerCache } from 'src/services/mcp/client.js';
-import {
-  areMcpConfigsAllowedWithEnterpriseMcpConfig,
-  dedupClaudeAiMcpServers,
-  doesEnterpriseMcpConfigExist,
-  filterMcpServersByPolicy,
-  getClaudeCodeMcpConfigs,
-  getMcpServerSignature,
-  parseMcpConfig,
-  parseMcpConfigFromFilePath,
-} from 'src/services/mcp/config.js';
-import { excludeCommandsByServer, excludeResourcesByServer } from 'src/services/mcp/utils.js';
 import { getRelevantTips } from 'src/services/tips/tipRegistry.js';
-import { logContextMetrics } from 'src/utils/api.js';
-import { CLAUDE_IN_CHROME_MCP_SERVER_NAME, isClaudeInChromeMCPServer } from 'src/utils/claudeInChrome/common.js';
-import { registerCleanup } from 'src/utils/cleanupRegistry.js';
 import { eagerParseCliFlag } from 'src/utils/cliArgs.js';
-import { createEmptyAttributionState } from 'src/utils/commitAttribution.js';
-import { countConcurrentSessions, registerSession, updateSessionName } from 'src/utils/concurrentSessions.js';
 import { getCwd } from 'src/utils/cwd.js';
-import { logForDebugging, setHasFormattedOutput } from 'src/utils/debug.js';
-import { errorMessage, getErrnoCode, isENOENT, TeleportOperationError, toError } from 'src/utils/errors.js';
+import { errorMessage, isENOENT } from 'src/utils/errors.js';
 import { getFsImplementation, safeResolvePath } from 'src/utils/fsOperations.js';
-import { gracefulShutdown, gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
-import { setAllHookEventsEnabled } from 'src/utils/hooks/hookEvents.js';
+import { gracefulShutdownSync } from 'src/utils/gracefulShutdown.js';
 import { refreshModelCapabilities } from 'src/utils/model/modelCapabilities.js';
-import { peekForStdinData, writeToStderr } from 'src/utils/process.js';
-import { setCwd } from 'src/utils/Shell.js';
-import { type ProcessedResume, processResumedConversation } from 'src/utils/sessionRestore.js';
+import { peekForStdinData } from 'src/utils/process.js';
 import { parseSettingSourcesFlag } from 'src/utils/settings/constants.js';
-import { plural } from 'src/utils/stringUtils.js';
 import {
-  type ChannelEntry,
   getInitialMainLoopModel,
   getIsNonInteractiveSession,
   getSdkBetas,
-  getSessionId,
-  getUserMsgOptIn,
-  setAllowedChannels,
   setAllowedSettingSources,
-  setChromeFlagOverride,
   setClientType,
   setCwdState,
   setDirectConnectServerUrl,
   setFlagSettingsPath,
-  setInitialMainLoopModel,
   setIsInteractive,
-  setKairosActive,
   setOriginalCwd,
   setQuestionPreviewFormat,
-  setSdkBetas,
-  setSessionBypassPermissionsMode,
-  setSessionPersistenceDisabled,
   setSessionSource,
   setUserMsgOptIn,
-  switchSession,
 } from './bootstrap/state.js';
 
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -327,34 +143,16 @@ import { migrateSonnet1mToSonnet45 } from './migrations/migrateSonnet1mToSonnet4
 import { migrateSonnet45ToSonnet46 } from './migrations/migrateSonnet45ToSonnet46.js';
 import { resetAutoModeOptInForDefaultOffer } from './migrations/resetAutoModeOptInForDefaultOffer.js';
 import { resetProToOpusDefault } from './migrations/resetProToOpusDefault.js';
-import { createRemoteSessionConfig } from './remote/RemoteSessionManager.js';
 /* eslint-enable @typescript-eslint/no-require-imports */
 // teleportWithProgress dynamically imported at call site
 import { createDirectConnectSession, DirectConnectError } from './server/createDirectConnectSession.js';
-import { initializeLspServerManager } from './services/lsp/manager.js';
-import { shouldEnablePromptSuggestion } from './services/PromptSuggestion/promptSuggestion.js';
-import { type AppState, getDefaultAppState, IDLE_SPECULATION_STATE } from './state/AppStateStore.js';
-import { onChangeAppState } from './state/onChangeAppState.js';
-import { createStore } from './state/store.js';
-import { asSessionId } from './types/ids.js';
-import { filterAllowedSdkBetas } from './utils/betas.js';
-import { isInBundledMode, isRunningWithBun } from './utils/bundledMode.js';
+import { isRunningWithBun } from './utils/bundledMode.js';
 import { logForDiagnosticsNoPII } from './utils/diagLogs.js';
-import { filterExistingPaths, getKnownPathsForRepo } from './utils/githubRepoPathMapping.js';
 import { loadAllPluginsCacheOnly } from './utils/plugins/pluginLoader.js';
 import { migrateChangelogFromConfig } from './utils/releaseNotes.js';
 import { SandboxManager } from './utils/sandbox/sandbox-adapter.js';
-import { fetchSession, prepareApiRequest } from './utils/teleport/api.js';
-import {
-  checkOutTeleportedSessionBranch,
-  processMessagesForTeleportResume,
-  teleportToRemoteWithErrorHandling,
-  validateGitState,
-  validateSessionRepository,
-} from './utils/teleport.js';
-import { shouldEnableThinkingByDefault, type ThinkingConfig } from './utils/thinking.js';
-import { initUser, resetUserCache } from './utils/user.js';
-import { getTmuxInstallInstructions, isTmuxAvailable, parsePRReference } from './utils/worktree.js';
+import { type ThinkingConfig } from './utils/thinking.js';
+import { initUser } from './utils/user.js';
 
 // eslint-disable-next-line custom-rules/no-top-level-side-effects
 profileCheckpoint('main_tsx_imports_loaded');

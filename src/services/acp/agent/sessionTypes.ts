@@ -4,7 +4,7 @@ import type {
   SessionModelState,
   SessionConfigOption,
 } from '@agentclientprotocol/sdk'
-import type { QueryEngine } from '../../../QueryEngine.js'
+import type { QueryEngine } from '../../../query/engine/QueryEngine.js'
 import type { Command } from '../../../types/command.js'
 import type { AppState } from '../../../state/AppStateStore.js'
 import type { ToolUseCache } from '../bridge.js'

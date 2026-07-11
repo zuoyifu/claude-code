@@ -18,10 +18,9 @@ import {
  * 不能赋值给变量、不能放在 return/ternary/&& 链里。因此 `isToolEnabled` 必须用
  * 显式的 if 语句展开每个 flag，不能用 `feature(flag)` 变量调用。
  *
- * H5 决策（Plan B 触发）：保留 getTools() 同步语义。本模块同时提供：
+ * H5 决策（Plan B 触发）：保留 getTools() 同步语义。本模块提供：
  *   - isToolEnabled(flag): 同步 flag 检查
  *   - loadFeatureGatedToolSync(flag): 同步加载（require()），供 assembler.ts 用
- *   - loadFeatureGatedTool(flag): 异步加载（dynamic import），供未来 async 化用
  */
 
 type _Tool = Tool
@@ -265,19 +264,6 @@ export function loadFeatureGatedToolSync(
     console.warn(`[feature-gate] ${flag}: sync require failed`, err)
     return null
   }
-}
-
-/**
- * 异步加载 feature-gated 工具（供未来 async getTools 化使用）。
- * 返回 null 表示：flag 禁用 / import 失败 / 无 default export。
- * L2 改进：失败时打 warning，不静默。
- */
-export async function loadFeatureGatedTool(
-  flag: FeatureGatedToolFlag,
-): Promise<_Tool | null> {
-  if (!isToolEnabled(flag)) return null
-  // 异步加载委托给同步 loader（两者语义一致，require 在 Bun 中是同步的）
-  return loadFeatureGatedToolSync(flag)
 }
 
 /**

@@ -13,7 +13,7 @@
  *
  * C2 之后：
  *   - 本文件将转为 async loadBuiltinTools() 形式
- *   - feature-gated 工具通过 registry/feature-gate.ts 的 loadFeatureGatedTool 加载
+ *   - feature-gated 工具通过 registry/feature-gate.ts 的 loadFeatureGatedToolSync 加载
  */
 import type { Tool } from '../core/types.js'
 import {

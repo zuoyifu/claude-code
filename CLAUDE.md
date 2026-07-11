@@ -92,7 +92,7 @@ bun run docs:dev
 
 ### Entry & Bootstrap
 
-1. **`src/entrypoints/cli.tsx`** — True entrypoint。`main()` 函数按优先级处理多条快速路径：
+1. **`src/entrypoints/cli.tsx`** (<200 行) — True entrypoint。`main()` 函数先调用 `cli/dispatcher/fast-paths.ts::handleFastPath()` 按优先级处理快速路径：
    - `--version` / `-v` — 零模块加载
    - `--dump-system-prompt` — feature-gated (DUMP_SYSTEM_PROMPT)
    - `--claude-in-chrome-mcp` / `--chrome-native-host`
@@ -104,15 +104,26 @@ bun run docs:dev
    - `new` / `list` / `reply` — Template job commands
    - `environment-runner` / `self-hosted-runner` — BYOC runner
    - `--tmux` + `--worktree` 组合
-   - 默认路径：加载 `main.tsx` 启动完整 CLI
-2. **`src/main.tsx`** (~5674 行) — Commander.js CLI definition。注册大量 subcommands：`mcp` (serve/add/remove/list...)、`server`、`ssh`、`open`、`auth`、`plugin`、`agents`、`auto-mode`、`doctor`、`update` 等。主 `.action()` 处理器负责权限、MCP、会话恢复、REPL/Headless 模式分发。
-3. **`src/entrypoints/init.ts`** — One-time initialization (telemetry, config, trust dialog)。
+   - 默认路径：创建 Commander program → 注册 subcommands → `.action(handleDefaultAction)` → parseAsync
+2. **`src/cli/`** — 从原 `main.tsx`（5640 行）拆分而来，包含 3 个子目录 + 若干顶层文件：
+   - `cli/program/` — Commander 实例创建 + 全局 option 注册（`index.ts`、`options.ts`、`types.ts`）
+   - `cli/dispatcher/` — 默认 `.action()` 主路径，按多个子模块拆分（`index.ts` 主分发、`runner.ts` 默认 action、`bootstrap.ts` 启动副作用集中点 telemetry/settings/MCP connect/prefetch、`fast-paths.ts` 唯一 fast-paths 模块含 bridge/daemon 快速路径、`options-normalizer.ts`、`permissions.ts`、`session-restore.ts`、`headless.ts`、`repl.ts`、`modes.ts`、`prompt-input.ts`、`teammate-options.ts`、`types.ts`）
+   - `cli/subcommands/` — 11 个 subcommand（mcp/auth/plugin/agents/doctor/update/server/auto-mode/autonomy/task）的静态 import 注册
+   - 顶层文件：`bg.ts`（后台会话）、`print.ts`（输出打印）、`structuredIO.ts`、`remoteIO.ts`、`exit.ts`、`rollback.ts`、`up.ts`、`updateCCB.ts`、`ndjsonSafeStringify.ts`，以及 `handlers/`、`transports/`、`bg/` 等辅助子目录
+3. **`src/commands/_registry/`** — 命令注册表。`generated.ts` 由 `scripts/generate-command-registry.ts` 在 build/dev 时编译期生成（扫描 `commands/<category>/<name>/index.ts`），不再是中央手动数组。
+4. **`src/entrypoints/init.ts`** — One-time initialization (telemetry, config, trust dialog)。
 
 ### Core Loop
 
-- **`src/query.ts`** — The main API query function. Sends messages to Claude API, handles streaming responses, processes tool calls, and manages the conversation turn loop.
-- **`src/QueryEngine.ts`** — Higher-level orchestrator wrapping `query()`. Manages conversation state, compaction, file history snapshots, attribution, and turn-level bookkeeping. Used by the REPL screen.
-- **`src/screens/REPL.tsx`** — The interactive REPL screen (React/Ink component). Handles user input, message display, tool permission prompts, and keyboard shortcuts.
+Core loop 已从 `src/query.ts`（2057 行）+ `src/QueryEngine.ts`（1365 行）共 3422 行的两个上帝文件，拆分为 `src/query/` 下三层强制单向依赖结构：
+
+- **`src/query/api.ts`** — API 层。单次 API 请求 + 流解码（`BetaRawMessageStreamEvent` 处理）。不依赖 loop/engine。
+- **`src/query/stream/`** — 流处理子模块：`handlers.ts`（流事件处理）、`reducer.ts`（消息归约）、`tool-call-extractor.ts`（工具调用提取）。
+- **`src/query/loop/`** — Turn 循环层。多 turn 编排（`index.ts` 主生成器）+ 工具派发（`tool-dispatch.ts`）+ 结果合并（`tool-result-merge.ts`）+ autonomy 决策（`autonomy.ts`）+ 输出限制（`output-validation.ts`）+ 错误恢复（`error-recovery.ts`）。子模块采用三种委托模式：AsyncGenerator 用 `yield*`、Promise 用 `await`、纯函数直接调用。
+- **`src/query/engine/`** — 会话级状态机层。`QueryEngine.ts` + `submit-message.ts`（37 个 yield 的生成器）+ `compaction.ts` + `attribution.ts` + `session-persist.ts` + `file-history.ts` + `interrupt.ts` + `messages-state.ts` + `nested-memory.ts` + `skill-discovery.ts`。
+- **`src/query/params.ts`** / **`src/query/types.ts`** / **`src/query/ask.ts`** — 共享类型与 `ask()` 顶层函数。
+- **依赖方向强制单向：** `engine → loop → api`（`query/loop/` 不得 import `query/engine/`，`query/api.ts` 不得 import `query/loop/` 或 `query/engine/`）。由 `.dependency-cruiser.js` 在 CI 中检查。
+- **`src/screens/REPL.tsx`** — The interactive REPL screen (React/Ink component). Handles user input, message display, tool permission prompts, and keyboard shortcuts. 调用 `QueryEngine.submitMessage()` 的 AsyncGenerator。
 
 ### API Layer
 
@@ -122,10 +133,18 @@ bun run docs:dev
 
 ### Tool System
 
-- **`src/Tool.ts`** — Tool interface definition (`Tool` type) and utilities (`findToolByName`, `toolMatchesName`).
-- **`src/tools.ts`** — Tool registry. Assembles the tool list; tools are imported from `@claude-code-best/builtin-tools` package. Some tools are conditionally loaded via `feature()` flags or `process.env.USER_TYPE`.
-- **`src/constants/tools.ts`** — `CORE_TOOLS` 白名单常量（38 个核心工具名），用于 `isDeferredTool` 白名单制判定。
-- **`packages/builtin-tools/src/tools/`** — 60 个工具目录（含 shared/testing 等工具目录），通过 `@claude-code-best/builtin-tools` 包导出。主要分类：
+工具系统已从散落 5 处（`src/Tool.ts`、`src/tools.ts`、`src/constants/tools.ts`、`src/services/tools/`、`src/services/searchExtraTools/`）合并为 `src/tools/` 下清晰分层：
+
+- **`src/tools/core/`** — Tool 类型定义 + 生命周期契约（原 `src/Tool.ts`）。零运行时依赖，纯类型层。包含 `findToolByName`、`toolMatchesName` 等工具函数（`types.ts`、`lookup.ts`、`validation.ts`、`build-tool.ts`、`index.ts`）。
+- **`src/tools/registry/`** — 工具注册 + 白名单 + feature gate 边界。子模块：
+  - `registry.ts` — 注册器实现（原 `src/tools.ts` 的装配逻辑）
+  - `feature-gate.ts` — **工具注册级 feature() 唯一边界**（约 15 处工具注册相关 `feature()` 调用集中于此）
+  - `feature-gated-flags.ts` — feature-gate 使用的 flag 常量
+  - `assembler.ts` — 工具列表组装（首次调用时惰性装配，preset 逻辑也在此）
+  - `whitelists.ts` — `CORE_TOOLS` 白名单（原 `src/constants/tools.ts`）
+- **`src/tools/execution/`** — 工具运行时（原 `src/services/tools/`，含 `run-tool-use.ts`、`hooks.ts`、`streaming-executor.ts`、`orchestrator.ts`、`permissions.ts`、`errors.ts`、`mcp-introspection.ts`）。**不得 import `tools/builtin/`、`tools/discovery/`** 防止循环。
+- **`src/tools/discovery/`** — TF-IDF 工具索引 + 延迟加载 + prefetch（原 `src/services/searchExtraTools/`）。`toolIndex.ts` 复用 `localSearch.ts` 的 TF-IDF 算法函数（`computeWeightedTf`、`computeIdf`、`cosineSimilarity` 已导出）。修改这些函数时需同步检查工具索引测试。`prefetch.ts` 的 `extractQueryFromMessages` 复用了 `skillSearch/prefetch.ts` 的同名导出函数，修改 skill prefetch 的该函数时需同步检查工具预取行为。工具预取使用独立的 `discoveredToolsThisSession` Set，与 skill prefetch 的去重集合互不影响。
+- **`src/tools/builtin/`** — 内置工具唯一接入点，通过 `@claude-code-best/builtin-tools` 包加载 60 个工具实现。主要分类：
   - **文件操作**: FileEditTool, FileReadTool, FileWriteTool, GlobTool, GrepTool
   - **Shell/执行**: BashTool, PowerShellTool, REPLTool
   - **Agent 系统**: AgentTool, TaskCreateTool, TaskUpdateTool, TaskListTool, TaskGetTool
@@ -134,8 +153,8 @@ bun run docs:dev
   - **调度**: CronCreateTool, CronDeleteTool, CronListTool
   - **工具发现**: SearchExtraToolsTool, ExecuteExtraTool, SyntheticOutput（CORE_TOOLS，用于延迟工具按需加载）
   - **其他**: LSPTool, ConfigTool, SkillTool, EnterWorktreeTool, ExitWorktreeTool 等
-- **`src/tools/shared/`** / **`packages/builtin-tools/src/tools/shared/`** — Tool 共享工具函数。
-- **`src/services/searchExtraTools/`** — TF-IDF 工具索引模块（`toolIndex.ts`），为延迟工具提供语义搜索能力。复用 `localSearch.ts` 的 TF-IDF 算法函数（`computeWeightedTf`、`computeIdf`、`cosineSimilarity` 已导出）。修改这些函数时需同步检查工具索引测试。`prefetch.ts` 的 `extractQueryFromMessages` 复用了 `skillSearch/prefetch.ts` 的同名导出函数，修改 skill prefetch 的该函数时需同步检查工具预取行为。工具预取使用独立的 `discoveredToolsThisSession` Set，与 skill prefetch 的去重集合互不影响。
+- **`packages/builtin-tools/src/tools/shared/`** — Tool 共享工具函数（`gitOperationTracking.ts`、`spawnMultiAgent.ts`）。纯 helper。注意：`src/tools/shared/` 不存在，共享 helper 仅在 builtin-tools 包内。
+- **内部依赖方向（由 `.dependency-cruiser.js` 在 CI 中检查）：** `core ← registry ← {builtin, discovery, execution}`。
 
 ### UI Layer (Ink)
 
@@ -281,6 +300,7 @@ Feature flags control which functionality is enabled at runtime. 代码中统一
 | Magic Docs / LSP Server | Restored — Magic Docs 自动更新 + LSP 服务器管理器 |
 | Plugins / Marketplace | Restored — 插件安装/卸载/启用/禁用 + Marketplace 浏览 |
 | MCP OAuth | Simplified |
+| 架构迁移（`main.tsx` / `query.ts` / `QueryEngine.ts` / `Tool.ts` / `tools.ts` / `commands.ts`） | Refactored — 拆分为 `src/cli/`（3 子目录 + 顶层文件）、`src/tools/`（5 子目录：core/registry/execution/discovery/builtin）、`src/query/`（api/stream/loop/engine 四层）、`src/commands/_registry/`（编译期生成注册表）。详见 `docs/superpowers/specs/2026-07-11-architecture-migration-design.md`。原上帝文件全部删除。 |
 
 ### Key Type Files
 
@@ -383,7 +403,7 @@ bun run precheck
 - **precheck must pass** — `bun run precheck`（typecheck + lint fix + test）必须零错误，任何修改都不能引入新的类型/lint/测试错误。
 - **Feature flags** — 默认全部关闭（`feature()` 返回 `false`）。Dev/build 各有自己的默认启用列表。不要在 `cli.tsx` 中重定义 `feature` 函数。
 - **React Compiler output** — Components have decompiled memoization boilerplate (`const $ = _c(N)`). This is normal.
-- **`bun:bundle` import** — `import { feature } from 'bun:bundle'` 是 Bun 内置模块，由运行时/构建器解析。不要用自定义函数替代它。**`feature()` 只能直接用在 `if` 语句或三元表达式的条件位置**（Bun 编译器限制），不能赋值给变量、不能放在箭头函数体里、不能作为 `&&` 链的一部分。正确：`if (feature('X')) {}` 或 `feature('X') ? a : b`。
+- **`bun:bundle` import** — `import { feature } from 'bun:bundle'` 是 Bun 内置模块，由运行时/构建器解析。不要用自定义函数替代它。**`feature()` 只能直接用在 `if` 语句或三元表达式的条件位置**（Bun 编译器限制），不能赋值给变量、不能放在箭头函数体里、不能作为 `&&` 链的一部分。正确：`if (feature('X')) {}` 或 `feature('X') ? a : b`。**工具注册级 feature() 调用（约 15 处）集中在 `src/tools/registry/feature-gate.ts`**，其他 tools/ 子目录不允许直接 import `bun:bundle`（由 `.dependency-cruiser.js` 检查）。UI/业务功能级 feature() 调用（约 200 处）保留现状，不在架构迁移范围。
 - **`src/` path alias** — tsconfig maps `src/*` to `./src/*`. Imports like `import { ... } from 'src/utils/...'` are valid.
 - **MACRO defines** — 集中管理在 `scripts/defines.ts`。Dev mode 通过 `bun -d` 注入，build 通过 `Bun.build({ define })` 注入。修改版本号等常量只改这个文件。
 - **构建产物兼容 Node.js** — `build.ts` 会自动后处理 `import.meta.require`，产物可直接用 `node dist/cli.js` 运行。
@@ -392,6 +412,8 @@ bun run precheck
 - **`@ts-expect-error` 维护** — 只在下方代码确实有类型错误时保留 `@ts-expect-error`。如果类型系统已更新导致 directive 变为 unused（TS2578），直接移除注释。MACRO 替换产生的永假比较（如 `'production' === 'development'`）仍需保留 `@ts-expect-error`。
 - **Ink 框架在 `packages/@ant/ink/`** — 不是 `src/ink/`（该目录不存在）。Ink 相关的组件、hooks、keybindings 都在 packages 中。
 - **Provider 优先级** — `modelType` 参数 > 环境变量 > 默认 `firstParty`。新增 provider 需在 `src/utils/model/providers.ts` 注册。
+- **架构边界（dependency-cruiser）** — `bun run lint:deps` 检查模块依赖方向（v2 架构 §3.2 规则）。CI 中 `lint:deps:strict` 以 error 级别阻断违规。修改 `src/tools/`、`src/cli/`、`src/query/`、`src/commands/` 时需确认不违反分层约束（见 `.dependency-cruiser.js`）。
+- **命令注册表（generated.ts）** — `src/commands/_registry/generated.ts` 由 `scripts/generate-command-registry.ts` 在 build/dev 时自动生成，**不要手动编辑**（文件头有 AUTO-GENERATED 标记）。新增命令：在 `src/commands/<category>/<name>/` 下创建 `index.ts`，build 时自动接入注册表。
 
 ## Design Context
 

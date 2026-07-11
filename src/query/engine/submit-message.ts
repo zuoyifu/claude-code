@@ -68,7 +68,7 @@ import type {
   SystemCompactBoundaryMessage,
 } from '../../types/message.js'
 import type { APIError } from '@anthropic-ai/sdk'
-import { query } from '../../query.js'
+import { query } from '../loop/production.js'
 import { accumulateUsage, updateUsage } from '../../services/api/claude.js'
 import { categorizeRetryableAPIError } from '../../services/api/errors.js'
 import { SYNTHETIC_OUTPUT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SyntheticOutputTool/SyntheticOutputTool.js'
@@ -78,10 +78,6 @@ import { toolMatchesName } from '../../tools/core/index.js'
 import type { AppState } from '../../state/AppState.js'
 import type { FileHistoryState } from '../../utils/fileHistory.js'
 import type { AttributionState } from '../../utils/commitAttribution.js'
-import {
-  fileHistoryEnabled,
-  fileHistoryMakeSnapshot,
-} from '../../utils/fileHistory.js'
 import { asSystemPrompt } from '../../utils/systemPromptType.js'
 import {
   getScratchpadDir,
@@ -106,14 +102,11 @@ import {
 } from './messages-state.js'
 import {
   flushBeforeResult,
-  flushPreservedSegmentTail,
-  persistAttachmentInline,
   persistLocalCommandTranscript,
   persistLoopMessage,
   persistUserInputTranscript,
 } from './session-persist.js'
 import { snapshotUserInputHistory } from './file-history.js'
-import { loadSkillsAndPlugins } from './skill-discovery.js'
 
 // Lazy: MessageSelector.tsx pulls React/ink; only needed for message filtering at query time
 /* eslint-disable @typescript-eslint/no-require-imports */

@@ -1,19 +1,14 @@
 import { describe, test, expect } from 'bun:test'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 
 const SRC = path.resolve(process.cwd(), 'src/query/engine')
 
 describe('C10.5 engine split (生产 src/QueryEngine.ts 迁移到 query/engine/)', () => {
-  test('src/QueryEngine.ts 保留为 re-export 包装层（< 50 行）', () => {
+  test('src/QueryEngine.ts 已删除（Plan A 完成态：shim 移除）', () => {
     const wrapperPath = path.resolve(process.cwd(), 'src/QueryEngine.ts')
-    expect(existsSync(wrapperPath)).toBe(true)
-    const content = readFileSync(wrapperPath, 'utf8')
-    // re-export wrapper 应当很短
-    expect(content.split('\n').length).toBeLessThan(50)
-    // 应当 re-export 自 query/engine/QueryEngine
-    expect(content).toMatch(/query\/engine\/QueryEngine/)
+    expect(existsSync(wrapperPath)).toBe(false)
   })
 
   test('engine/ 含 10 个子模块（骨架 + 生产）', () => {
@@ -38,7 +33,6 @@ describe('C10.5 engine split (生产 src/QueryEngine.ts 迁移到 query/engine/)
     const expected = [
       'engine-state.ts',
       'system-prompt.ts',
-      'process-user-input.ts',
       'loop-result.ts',
       'loop-message-handler.ts',
     ]

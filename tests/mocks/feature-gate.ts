@@ -54,15 +54,6 @@ function _factory() {
     isToolEnabled: (flag: FeatureGatedToolFlag): boolean =>
       state.enabledFlags.has(flag),
 
-    loadFeatureGatedTool: async (
-      flag: FeatureGatedToolFlag,
-    ): Promise<unknown> => {
-      if (!state.enabledFlags.has(flag)) return null
-      const custom = state.customLoaders[flag]
-      if (custom) return custom()
-      return null // 默认返回 null，测试可按需覆盖
-    },
-
     loadFeatureGatedToolSync: (flag: FeatureGatedToolFlag): unknown => {
       if (!state.enabledFlags.has(flag)) return null
       const custom = state.customLoaders[flag]

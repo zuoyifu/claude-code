@@ -16,7 +16,7 @@ import {
 } from '../../cost-tracker.js'
 import { getFastModeState } from '../../utils/fastMode.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
-import { countToolCalls, SYNTHETIC_MESSAGES } from '../../utils/messages.js'
+import { countToolCalls } from '../../utils/messages.js'
 import {
   flushSessionStorage,
   recordTranscript,
@@ -34,7 +34,6 @@ import type { BetaMessageDeltaUsage } from '@anthropic-ai/sdk/resources/beta/mes
 import type { APIError } from '@anthropic-ai/sdk'
 import type { NonNullableUsage } from '@ant/model-provider'
 import type {
-  SDKCompactBoundaryMessage,
   SDKMessage,
   SDKUserMessageReplay,
 } from '../../entrypoints/agentSdkTypes.js'

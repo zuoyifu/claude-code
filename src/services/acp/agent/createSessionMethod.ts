@@ -11,8 +11,8 @@ import type {
   SessionModelState,
 } from '@agentclientprotocol/sdk'
 import type { Message } from '../../../types/message.js'
-import { QueryEngine } from '../../../QueryEngine.js'
-import type { QueryEngineConfig } from '../../../QueryEngine.js'
+import { QueryEngine } from '../../../query/engine/QueryEngine.js'
+import type { QueryEngineConfig } from '../../../query/engine/QueryEngine.js'
 import type { Tools } from '../../../tools/core/index.js'
 import { getTools } from '../../../tools/registry/assembler.js'
 import { getEmptyToolPermissionContext } from '../../../tools/core/index.js'

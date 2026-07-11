@@ -151,7 +151,9 @@ export async function writeLearnedSkill(
   await writeFile(filePath, draft.content, 'utf8')
   clearSkillIndexCache()
   try {
-    const { clearCommandsCache } = await import('../../commands.js')
+    const { clearCommandsCache } = await import(
+      '../../commands/_registry/registry.js'
+    )
     clearCommandsCache()
   } catch {
     // Best effort: the next process will see the generated skill even if the

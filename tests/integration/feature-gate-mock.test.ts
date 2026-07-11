@@ -51,22 +51,22 @@ describe('feature-gate mock 端到端', () => {
     expect(list.length).toBe(2)
   })
 
-  test('loadFeatureGatedTool 默认返回 null', async () => {
+  test('loadFeatureGatedToolSync 默认返回 null', async () => {
     mock.module('src/tools/registry/feature-gate.ts', featureGateMock)
 
-    const { loadFeatureGatedTool } = await import(
+    const { loadFeatureGatedToolSync } = await import(
       '../../src/tools/registry/feature-gate.ts'
     )
 
     featureGateMock.enable('GOAL')
-    const result = await loadFeatureGatedTool('GOAL')
+    const result = loadFeatureGatedToolSync('GOAL')
     expect(result).toBeNull()
   })
 
-  test('registerLoader 后 loadFeatureGatedTool 返回自定义值', async () => {
+  test('registerLoader 后 loadFeatureGatedToolSync 仍返回 null（mock sync 限制）', async () => {
     mock.module('src/tools/registry/feature-gate.ts', featureGateMock)
 
-    const { loadFeatureGatedTool } = await import(
+    const { loadFeatureGatedToolSync } = await import(
       '../../src/tools/registry/feature-gate.ts'
     )
 
@@ -74,8 +74,9 @@ describe('feature-gate mock 端到端', () => {
     featureGateMock.enable('GOAL')
     featureGateMock.registerLoader('GOAL', async () => fakeTool)
 
-    const result = await loadFeatureGatedTool('GOAL')
-    expect(result).toEqual(fakeTool)
+    // mock 环境下 sync loader 无法等待 async custom loader，仍返回 null
+    const result = loadFeatureGatedToolSync('GOAL')
+    expect(result).toBeNull()
   })
 
   test('setState 一次性设置多个 flag', async () => {

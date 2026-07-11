@@ -51,7 +51,8 @@
     "prepublishOnly": "bun run build:vite",
     "lint": "biome lint .",
     "lint:fix": "biome lint --fix .",
-    "lint:deps": "depcruise src --config",
+    "lint:deps": "depcruise 'src/**/*.{ts,tsx,js,jsx}' --config --output-type err-long",
+    "lint:deps:strict": "depcruise 'src/**/*.{ts,tsx,js,jsx}' --config",
     "lint:circular": "madge --circular --extensions ts,tsx src/",
     "format": "biome format --write .",
     "check": "biome check .",
@@ -68,7 +69,7 @@
     "postinstall": "node scripts/run-parallel.mjs scripts/postinstall.cjs scripts/setup-chrome-mcp.mjs",
     "docs:dev": "npx mintlify dev",
     "typecheck": "tsc --noEmit",
-    "precheck": "bun run typecheck && bun run check:fix && bun test",
+    "precheck": "bun run typecheck && bun run check:fix && bun run lint:deps:strict && bun test",
     "rcs": "bun run scripts/rcs.ts"
   },
   "dependencies": {

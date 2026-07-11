@@ -4,6 +4,7 @@ import { AgentTool } from '@claude-code-best/builtin-tools/tools/AgentTool/Agent
 import { isInForkChild } from '@claude-code-best/builtin-tools/tools/AgentTool/forkSubagent.js';
 import { logForDebugging } from '../../../utils/debug.js';
 import type { LocalJSXCommandOnDone, LocalJSXCommandContext } from '../../../types/command.js';
+import type { AssistantMessage } from '../../../types/message.js';
 
 export async function call(
   onDone: LocalJSXCommandOnDone,
@@ -31,7 +32,9 @@ export async function call(
   }
 
   // Find the last assistant message to fork from
-  const lastAssistantMessage = [...context.messages].reverse().find(m => m.type === 'assistant') as any; // Type assertion to avoid complex type import
+  const lastAssistantMessage: AssistantMessage | undefined = [...context.messages]
+    .reverse()
+    .find((m): m is AssistantMessage => m.type === 'assistant');
 
   if (!lastAssistantMessage) {
     onDone('Cannot fork: no assistant response in conversation history.', { display: 'system' });
