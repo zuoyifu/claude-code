@@ -1,6 +1,6 @@
 import React, { Suspense, use, useDeferredValue, useEffect, useState } from 'react';
 import type { DeepImmutable } from 'src/types/utils.js';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { useTerminalSize } from '../../hooks/useTerminalSize.js';
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink';
 import { useKeybindings } from '../../keybindings/useKeybinding.js';

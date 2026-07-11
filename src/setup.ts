@@ -18,7 +18,7 @@ import {
   setProjectRoot,
   switchSession,
 } from './bootstrap/state.js'
-import { getCommands } from './commands.js'
+import { getCommands } from './commands/_registry/registry.js'
 import { initSessionMemory } from './services/SessionMemory/sessionMemory.js'
 import { initSkillLearning } from './services/skillLearning/runtimeObserver.js'
 import { asSessionId } from './types/ids.js'

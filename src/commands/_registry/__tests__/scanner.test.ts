@@ -98,9 +98,9 @@ describe('scanner', () => {
       expect(code).toContain(
         "import cmd_session_clear from '../../commands/session/clear/index.js'",
       )
-      expect(code).toContain('...cmd_session_clear')
-      expect(code).toContain("category: 'session'")
-      expect(code).toContain("sourcePath: 'commands/session/clear/index.js'")
+      expect(code).toContain('_reg(cmd_session_clear')
+      expect(code).toContain("'session'")
+      expect(code).toContain("'commands/session/clear/index.js'")
     })
 
     test('特殊字符的命令名被 sanitize', () => {
@@ -126,6 +126,7 @@ describe('scanner', () => {
       // 去掉 import（含 import type）、export 和 TS 类型注解，只验证 JS 表达式部分
       const stripped = code
         .replace(/import[^\n]*\n/g, '')
+        .replace(/\/\/ @ts-expect-error[^\n]*\n/g, '')
         .replace(/export /g, '')
         .replace(/:\s*RegisteredCommand\[\]/g, '')
       expect(() => new Function(stripped)).not.toThrow()

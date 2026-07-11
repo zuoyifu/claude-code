@@ -59,7 +59,7 @@ import { getInitialSettings, getSettingsForSource, updateSettingsForSource } fro
 import { getUserMsgOptIn, setUserMsgOptIn } from '../../bootstrap/state.js';
 import { DEFAULT_OUTPUT_STYLE_NAME } from 'src/constants/outputStyles.js';
 import { isEnvTruthy, isRunningOnHomespace } from 'src/utils/envUtils.js';
-import type { LocalJSXCommandContext, CommandResultDisplay } from '../../commands.js';
+import type { LocalJSXCommandContext, CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js';
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js';
 import {
@@ -447,13 +447,13 @@ export function Config({
             label: 'Poor mode (save tokens)',
             value: (() => {
               const PoorMode =
-                require('../../commands/poor/poorMode.js') as typeof import('../../commands/poor/poorMode.js');
+                require('../../commands/_misc/poor/poorMode.js') as typeof import('../../commands/_misc/poor/poorMode.js');
               return PoorMode.isPoorModeActive();
             })(),
             type: 'boolean' as const,
             onChange(enabled: boolean) {
               const PoorMode =
-                require('../../commands/poor/poorMode.js') as typeof import('../../commands/poor/poorMode.js');
+                require('../../commands/_misc/poor/poorMode.js') as typeof import('../../commands/_misc/poor/poorMode.js');
               PoorMode.setPoorMode(enabled);
               setAppState(prev => ({
                 ...prev,

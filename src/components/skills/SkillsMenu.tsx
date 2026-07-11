@@ -6,7 +6,7 @@ import {
   type CommandResultDisplay,
   getCommandName,
   type PromptCommand,
-} from '../../commands.js';
+} from '../../commands/_registry/registry.js';
 import { Box, FuzzyPicker, Text } from '@anthropic/ink';
 import type { Theme } from '@anthropic/ink';
 import { estimateSkillFrontmatterTokens } from '../../skills/loadSkillsDir.js';

@@ -2,7 +2,7 @@ import figures from 'figures';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
-import { addDirHelpMessage, validateDirectoryForWorkspace } from '../../../commands/add-dir/validation.js';
+import { addDirHelpMessage, validateDirectoryForWorkspace } from '../../../commands/files/add-dir/validation.js';
 import TextInput from '../../../components/TextInput.js';
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink';
 import { useKeybinding } from '../../../keybindings/useKeybinding.js';

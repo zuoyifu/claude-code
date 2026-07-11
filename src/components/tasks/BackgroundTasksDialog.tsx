@@ -21,8 +21,8 @@ import { type BackgroundTaskState, isBackgroundTask, type TaskState } from 'src/
 import type { DeepImmutable } from 'src/types/utils.js';
 import { intersperse } from 'src/utils/array.js';
 import { TEAM_LEAD_NAME } from 'src/utils/swarm/constants.js';
-import { stopUltraplan } from '../../commands/ultraplan.js';
-import type { CommandResultDisplay } from '../../commands.js';
+import { stopUltraplan } from '../../commands/_misc/ultraplan.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { useRegisterOverlay } from '../../context/overlayContext.js';
 import type { ExitState } from '../../hooks/useExitOnCtrlCDWithKeybindings.js';
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink';

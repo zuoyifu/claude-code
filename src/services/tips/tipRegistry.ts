@@ -6,7 +6,7 @@ import {
   getSettings_DEPRECATED,
   getSettingsForSource,
 } from 'src/utils/settings/settings.js'
-import { shouldOfferTerminalSetup } from '../../commands/terminalSetup/terminalSetup.js'
+import { shouldOfferTerminalSetup } from '../../commands/_misc/terminalSetup/terminalSetup.js'
 import { getDesktopUpsellConfig } from '../../components/DesktopUpsell/DesktopUpsellStartup.js'
 import { color } from '@anthropic/ink'
 import { shouldShowOverageCreditUpsell } from '../../components/LogoV2/OverageCreditUpsell.js'

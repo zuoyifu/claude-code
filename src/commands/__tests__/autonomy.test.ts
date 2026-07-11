@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import type React from 'react'
-import autonomyCommand from '../autonomy'
+import autonomyCommand from '../_misc/autonomy/index'
 import {
   resetStateForTests,
   setOriginalCwd,
@@ -22,7 +22,7 @@ import { cleanupTempDir, createTempDir } from '../../../tests/mocks/file-system'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { writeRegistry } from '../../utils/pipeRegistry'
-import { getAutonomyPanelBaseActionCountForTests } from '../autonomyPanel'
+import { getAutonomyPanelBaseActionCountForTests } from '../_misc/autonomy/autonomyPanel'
 
 let tempDir = ''
 let previousConfigDir: string | undefined

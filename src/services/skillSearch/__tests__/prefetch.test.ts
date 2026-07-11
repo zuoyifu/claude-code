@@ -8,7 +8,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { clearCommandsCache } from '../../../commands.js'
+import { clearCommandsCache } from '../../../commands/_registry/registry.js'
 import { getTurnZeroSkillDiscovery } from '../prefetch.js'
 import { clearSkillIndexCache } from '../localSearch.js'
 

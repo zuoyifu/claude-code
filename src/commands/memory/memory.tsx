@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises';
 import * as React from 'react';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../types/command.js';
 import { Dialog } from '@anthropic/ink';
 import { MemoryFileSelector } from '../../components/memory/MemoryFileSelector.js';
 import { getRelativeMemoryPath } from '../../components/memory/MemoryUpdateNotification.js';

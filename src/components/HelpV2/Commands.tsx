@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
-import { type Command, formatDescriptionWithSource } from '../../commands.js';
+import { type Command, formatDescriptionWithSource } from '../../commands/_registry/registry.js';
 import { truncate } from '../../utils/truncate.js';
 import { Box, Text, useTabHeaderFocus } from '@anthropic/ink';
 import { Select } from '../CustomSelect/select.js';

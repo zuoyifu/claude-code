@@ -77,7 +77,10 @@ import {
   getDefaultOpusModel,
 } from './model/model.js'
 import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js'
-import { getSkillToolCommands, getMcpSkillCommands } from '../commands.js'
+import {
+  getSkillToolCommands,
+  getMcpSkillCommands,
+} from '../commands/_registry/registry.js'
 import type { Command } from '../types/command.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { getProjectRoot } from '../bootstrap/state.js'
@@ -2429,7 +2432,7 @@ export function startRelevantMemoryPrefetch(
 
   // Poor mode: skip the side-query to save tokens
   const { isPoorModeActive } =
-    require('../commands/poor/poorMode.js') as typeof import('../commands/poor/poorMode.js')
+    require('../commands/_misc/poor/poorMode.js') as typeof import('../commands/_misc/poor/poorMode.js')
   if (isPoorModeActive()) {
     return undefined
   }

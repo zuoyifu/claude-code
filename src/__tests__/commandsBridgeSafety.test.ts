@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { isBridgeSafeCommand } from '../commands.js'
-import clear from '../commands/clear/index.js'
-import plan from '../commands/plan/index.js'
-import proactive from '../commands/proactive.js'
+import { isBridgeSafeCommand } from '../commands/_registry/registry.js'
+import clear from '../commands/session/clear/index.js'
+import plan from '../commands/_misc/plan/index.js'
+import proactive from '../commands/_misc/proactive.js'
 
 describe('isBridgeSafeCommand', () => {
   test('allows bridge-safe local-jsx commands', () => {

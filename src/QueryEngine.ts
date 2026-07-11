@@ -19,8 +19,8 @@ import { accumulateUsage, updateUsage } from 'src/services/api/claude.js'
 import type { NonNullableUsage } from '@ant/model-provider'
 import { EMPTY_USAGE } from '@ant/model-provider'
 import stripAnsi from 'strip-ansi'
-import type { Command } from './commands.js'
-import { getSlashCommandToolSkills } from './commands.js'
+import type { Command } from './commands/_registry/registry.js'
+import { getSlashCommandToolSkills } from './commands/_registry/registry.js'
 import {
   LOCAL_COMMAND_STDERR_TAG,
   LOCAL_COMMAND_STDOUT_TAG,

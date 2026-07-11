@@ -1,4 +1,4 @@
-import type { Command } from '../../../commands.js';
+import type { Command } from '../../../commands/_registry/registry.js';
 import type { MCPServerConnection, ServerResource } from '../../../services/mcp/types.js';
 import type { Tool } from '../../../tools/core/index.js';
 

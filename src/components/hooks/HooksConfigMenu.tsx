@@ -14,7 +14,7 @@ import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js';
 import { useAppState, useAppStateStore } from 'src/state/AppState.js';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { useSettingsChange } from '../../hooks/useSettingsChange.js';
 import { Box, Text } from '@anthropic/ink';
 import { useKeybinding } from '../../keybindings/useKeybinding.js';

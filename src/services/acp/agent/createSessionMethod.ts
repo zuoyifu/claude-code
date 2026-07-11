@@ -17,7 +17,7 @@ import type { Tools } from '../../../tools/core/index.js'
 import { getTools } from '../../../tools/registry/assembler.js'
 import { getEmptyToolPermissionContext } from '../../../tools/core/index.js'
 import type { PermissionMode } from '../../../types/permissions.js'
-import { getCommands } from '../../../commands.js'
+import { getCommands } from '../../../commands/_registry/registry.js'
 import { getAgentDefinitionsWithOverrides } from '@claude-code-best/builtin-tools/tools/AgentTool/loadAgentsDir.js'
 import {
   setOriginalCwd,

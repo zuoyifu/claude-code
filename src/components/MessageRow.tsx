@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { Command } from '../commands.js';
+import type { Command } from '../commands/_registry/registry.js';
 import { Box } from '@anthropic/ink';
 import type { Screen } from '../screens/REPL.js';
 import type { Tools } from '../tools/core/index.js';

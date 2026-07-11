@@ -283,7 +283,9 @@ const extractSessionMemory = sequential(async function (
 
   // Poor mode: skip to reduce token consumption
   if (feature('POOR')) {
-    const { isPoorModeActive } = await import('../../commands/poor/poorMode.js')
+    const { isPoorModeActive } = await import(
+      '../../commands/_misc/poor/poorMode.js'
+    )
     if (isPoorModeActive()) return
   }
 

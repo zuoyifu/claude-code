@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
-import type { Command } from '../../commands.js'
+import type { Command } from '../../commands/_registry/registry.js'
 
 mock.module('bun:bundle', () => ({
   feature: (_name: string) => false,
@@ -108,7 +108,7 @@ beforeEach(async () => {
   originalUserType = process.env.USER_TYPE
   originalSafeUser = process.env.SAFEUSER
   originalUser = process.env.USER
-  const mod = await import('../commit-push-pr.js')
+  const mod = await import('../_misc/commit-push-pr.js')
   commitPushPr = mod.default as Command
 })
 
@@ -271,7 +271,7 @@ describe('commit-push-pr getPromptForCommand', () => {
     }))
 
     // Re-import to pick up the new mock
-    const { default: freshCmd } = await import('../commit-push-pr.js')
+    const { default: freshCmd } = await import('../_misc/commit-push-pr.js')
 
     await (freshCmd as any).getPromptForCommand('', {
       getAppState: () => ({
@@ -315,7 +315,7 @@ describe('commit-push-pr getPromptForCommand', () => {
       countUserPromptsInMessages: () => 0,
     }))
 
-    const { default: freshCmd } = await import('../commit-push-pr.js')
+    const { default: freshCmd } = await import('../_misc/commit-push-pr.js')
 
     const result = await (freshCmd as any).getPromptForCommand(
       '',

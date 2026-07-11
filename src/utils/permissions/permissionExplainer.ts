@@ -8,7 +8,7 @@ import { errorMessage } from '../errors.js'
 import { lazySchema } from '../lazySchema.js'
 import { logError } from '../log.js'
 import { getMainLoopModel, getSmallFastModel } from '../model/model.js'
-import { isPoorModeActive } from '../../commands/poor/poorMode.js'
+import { isPoorModeActive } from '../../commands/_misc/poor/poorMode.js'
 import { sideQuery } from '../sideQuery.js'
 import { jsonStringify } from '../slowOperations.js'
 

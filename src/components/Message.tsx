@@ -8,7 +8,7 @@ import type {
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/index.mjs';
 import * as React from 'react';
-import type { Command } from '../commands.js';
+import type { Command } from '../commands/_registry/registry.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { Box } from '@anthropic/ink';
 import type { Tools } from '../tools/core/index.js';

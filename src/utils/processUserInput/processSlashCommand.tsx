@@ -11,7 +11,7 @@ import {
   getCommandName,
   hasCommand,
   type PromptCommand,
-} from 'src/commands.js';
+} from 'src/commands/_registry/registry.js';
 import { NO_CONTENT_MESSAGE } from 'src/constants/messages.js';
 import type { SetToolJSXFn, ToolUseContext } from 'src/tools/core/index.js';
 import type {

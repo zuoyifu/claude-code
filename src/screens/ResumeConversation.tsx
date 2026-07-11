@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import React from 'react';
 import { useTerminalSize } from 'src/hooks/useTerminalSize.js';
 import { getOriginalCwd, switchSession } from '../bootstrap/state.js';
-import type { Command } from '../commands.js';
+import type { Command } from '../commands/_registry/registry.js';
 import { LogSelector } from '../components/LogSelector.js';
 import { Spinner } from '../components/Spinner.js';
 import { restoreCostStateForSession } from '../cost-tracker.js';

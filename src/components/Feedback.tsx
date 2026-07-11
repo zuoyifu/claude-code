@@ -9,7 +9,7 @@ import {
   logEvent,
 } from 'src/services/analytics/index.js';
 import { getLastAssistantMessage, normalizeMessagesForAPI } from 'src/utils/messages.js';
-import type { CommandResultDisplay } from '../commands.js';
+import type { CommandResultDisplay } from '../commands/_registry/registry.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { Box, Text, useInput } from '@anthropic/ink';
 import { useKeybinding } from '../keybindings/useKeybinding.js';

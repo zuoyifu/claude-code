@@ -132,7 +132,7 @@ export async function* handleStopHooks(
   // or forked agents contending for resources during shutdown.
   // Poor mode: also skip prompt suggestion and memory extraction.
   const poorMode = feature('POOR')
-    ? (await import('../commands/poor/poorMode.js')).isPoorModeActive()
+    ? (await import('../commands/_misc/poor/poorMode.js')).isPoorModeActive()
     : false
   if (!isBareMode()) {
     // Inline env check for dead code elimination in external builds

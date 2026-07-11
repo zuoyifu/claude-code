@@ -8,8 +8,8 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { call } from '../../../commands/skill-learning/skill-learning.js'
-import { clearCommandsCache } from '../../../commands.js'
+import { call } from '../../../commands/skills/skill-learning/skill-learning.js'
+import { clearCommandsCache } from '../../../commands/_registry/registry.js'
 import { getSkillIndex, searchSkills } from '../../skillSearch/localSearch.js'
 import {
   resetSkillLearningConfig,

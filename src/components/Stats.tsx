@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import figures from 'figures';
 import React, { Suspense, use, useCallback, useEffect, useMemo, useState } from 'react';
 import stripAnsi from 'strip-ansi';
-import type { CommandResultDisplay } from '../commands.js';
+import type { CommandResultDisplay } from '../commands/_registry/registry.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw j/k/arrow stats navigation
 import {

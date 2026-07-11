@@ -13,7 +13,7 @@ import {
   getBridgeCommandSafety,
   getCommandName,
   type LocalJSXCommandContext,
-} from '../../commands.js'
+} from '../../commands/_registry/registry.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
 import type { IDESelection } from '../../hooks/useIdeSelection.js'
 import type { SetToolJSXFn, ToolUseContext } from '../../tools/core/index.js'

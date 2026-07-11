@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { ClaudeAuthProvider } from '../../services/mcp/auth.js';
 import type {
   McpClaudeAIProxyServerConfig,

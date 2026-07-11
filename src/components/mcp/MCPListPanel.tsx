@@ -1,6 +1,6 @@
 import figures from 'figures';
 import React, { useCallback, useState } from 'react';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { Box, color, Link, Text, useTheme } from '@anthropic/ink';
 import { useKeybindings } from '../../keybindings/useKeybinding.js';
 import type { ConfigScope } from '../../services/mcp/types.js';

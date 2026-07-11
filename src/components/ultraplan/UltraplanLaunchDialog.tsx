@@ -4,7 +4,7 @@ import { Select } from '../CustomSelect/select.js';
 import { Dialog } from '../design-system/Dialog.js';
 import { useAppState, useSetAppState } from '../../state/AppState.js';
 import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js';
-import { CCR_TERMS_URL } from '../../commands/ultraplan.js';
+import { CCR_TERMS_URL } from '../../commands/_misc/ultraplan.js';
 import { getPromptIdentifier, getDialogConfig, type PromptIdentifier } from 'src/utils/ultraplan/prompt.js';
 
 // ---------------------------------------------------------------------------

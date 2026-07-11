@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
-import type { Command } from '../../commands.js'
+import type { Command } from '../../commands/_registry/registry.js'
 
 // Mock bun:bundle before any imports that use feature()
 mock.module('bun:bundle', () => ({
@@ -28,7 +28,7 @@ let originalUserType: string | undefined
 
 beforeEach(async () => {
   originalUserType = process.env.USER_TYPE
-  const mod = await import('../commit.js')
+  const mod = await import('../_misc/commit/index.js')
   commit = mod.default as Command
 })
 
@@ -159,7 +159,7 @@ describe('commit command getPromptForCommand', () => {
       },
     }))
 
-    const mod = await import('../commit.js')
+    const mod = await import('../_misc/commit/index.js')
     const freshCommit = mod.default as any
 
     await freshCommit.getPromptForCommand('', mockContext)
@@ -214,7 +214,7 @@ describe('commit command getPromptForCommand', () => {
       countUserPromptsInMessages: () => 0,
     }))
 
-    const { default: freshCommit } = await import('../commit.js')
+    const { default: freshCommit } = await import('../_misc/commit/index.js')
     const mockContext = {
       getAppState: () => ({
         toolPermissionContext: {
@@ -242,7 +242,7 @@ describe('commit command getPromptForCommand', () => {
       },
     }))
 
-    const { default: freshCommit } = await import('../commit.js')
+    const { default: freshCommit } = await import('../_misc/commit/index.js')
     const baseAppState = {
       toolPermissionContext: {
         alwaysAllowRules: { command: ['old-rule'] },

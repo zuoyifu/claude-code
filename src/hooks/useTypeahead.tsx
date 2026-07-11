@@ -3,7 +3,7 @@ import { useNotifications } from 'src/context/notifications.js';
 import { Text } from '@anthropic/ink';
 import { logEvent } from 'src/services/analytics/index.js';
 import { useDebounceCallback } from 'usehooks-ts';
-import { type Command, getCommandName } from '../commands.js';
+import { type Command, getCommandName } from '../commands/_registry/registry.js';
 import { getModeFromInput, getValueFromInput } from '../components/PromptInput/inputModes.js';
 import type { SuggestionItem, SuggestionType } from '../components/PromptInput/PromptInputFooterSuggestions.js';
 import { useIsModalOverlayActive, useRegisterOverlay } from '../context/overlayContext.js';

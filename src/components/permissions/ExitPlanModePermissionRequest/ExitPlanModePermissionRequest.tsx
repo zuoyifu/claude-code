@@ -16,8 +16,8 @@ import {
   setNeedsAutoModeExitAttachment,
   setNeedsPlanModeExitAttachment,
 } from '../../../bootstrap/state.js';
-import { generateSessionName } from '../../../commands/rename/generateSessionName.js';
-import { launchUltraplan } from '../../../commands/ultraplan.js';
+import { generateSessionName } from '../../../commands/session/rename/generateSessionName.js';
+import { launchUltraplan } from '../../../commands/_misc/ultraplan.js';
 import { type KeyboardEvent, Box, Text } from '@anthropic/ink';
 import type { AppState } from '../../../state/AppStateStore.js';
 import { AGENT_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/AgentTool/constants.js';

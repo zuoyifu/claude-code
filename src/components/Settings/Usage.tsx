@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { extraUsage as extraUsageCommand } from 'src/commands/extra-usage/index.js';
+import { extraUsage as extraUsageCommand } from 'src/commands/debug/extra-usage/index.js';
 import { formatCost } from 'src/cost-tracker.js';
 import { getSubscriptionType } from 'src/utils/auth.js';
 import { useTerminalSize } from '../../hooks/useTerminalSize.js';

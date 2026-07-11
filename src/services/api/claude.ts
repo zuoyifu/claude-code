@@ -96,7 +96,7 @@ import {
 import {
   getBreakCacheMarkerPath,
   getBreakCacheAlwaysPath,
-} from '../../commands/break-cache/index.js'
+} from '../../commands/debug/break-cache/index.js'
 import { tokenCountFromLastAPIResponse } from '../../utils/tokens.js'
 import { getDynamicConfig_BLOCKS_ON_INIT } from '../analytics/growthbook.js'
 import {

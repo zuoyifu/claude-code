@@ -118,7 +118,7 @@ import {
   type ResumeEntrypoint,
   getCommandName,
   isCommandEnabled,
-} from '../commands.js';
+} from '../commands/_registry/registry.js';
 import type { PromptInputMode, QueuedCommand, VimMode } from '../types/textInputTypes.js';
 import {
   MessageSelector,
@@ -387,7 +387,7 @@ import {
   type IdeType,
 } from '../utils/ide.js';
 import { useIDEIntegration } from '../hooks/useIDEIntegration.js';
-import exit from '../commands/exit/index.js';
+import exit from '../commands/_misc/exit/index.js';
 import { ExitFlow } from '../components/ExitFlow.js';
 import { getCurrentWorktreeSession } from '../utils/worktree.js';
 import {
@@ -485,10 +485,10 @@ import { CompanionSprite, CompanionFloatingBubble, MIN_COLS_FOR_FULL_SPRITE } fr
 import { DevBar } from '../components/DevBar.js';
 import { UltraplanChoiceDialog } from '../components/ultraplan/UltraplanChoiceDialog.js';
 import { UltraplanLaunchDialog } from '../components/ultraplan/UltraplanLaunchDialog.js';
-import { launchUltraplan } from '../commands/ultraplan.js';
+import { launchUltraplan } from '../commands/_misc/ultraplan.js';
 // Session manager removed - using AppState now
 import type { RemoteSessionConfig } from '../remote/RemoteSessionManager.js';
-import { REMOTE_SAFE_COMMANDS } from '../commands.js';
+import { REMOTE_SAFE_COMMANDS } from '../commands/_registry/registry.js';
 import type { RemoteMessageContent } from '../utils/teleport/api.js';
 import { FullscreenLayout, useUnseenDivider, computeUnseenDivider } from '../components/FullscreenLayout.js';
 import { isFullscreenEnvEnabled, maybeGetTmuxMouseHint, isMouseTrackingEnabled } from '../utils/fullscreen.js';
@@ -3858,7 +3858,7 @@ export function REPL({
         // can access the same plan file after regenerateSessionId()
         const oldPlanSlug = initialMsg.message.planContent ? getPlanSlug() : undefined;
 
-        const { clearConversation } = await import('../commands/clear/conversation.js');
+        const { clearConversation } = await import('../commands/session/clear/conversation.js');
         await clearConversation({
           setMessages,
           readFileState: readFileState.current,
@@ -6227,7 +6227,7 @@ export function REPL({
                         });
                       }
                       if (action === 'clear') {
-                        const { clearConversation } = await import('../commands/clear/conversation.js');
+                        const { clearConversation } = await import('../commands/session/clear/conversation.js');
                         await clearConversation({
                           setMessages,
                           readFileState: readFileState.current,

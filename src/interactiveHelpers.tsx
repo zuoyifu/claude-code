@@ -11,7 +11,7 @@ import {
   setSessionTrustAccepted,
   setStatsStore,
 } from './bootstrap/state.js';
-import type { Command } from './commands.js';
+import type { Command } from './commands/_registry/registry.js';
 import { createStatsStore, type StatsStore } from './context/stats.js';
 import { getSystemContext } from './context.js';
 import { initializeTelemetryAfterTrust } from './entrypoints/init.js';

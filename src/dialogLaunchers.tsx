@@ -90,7 +90,7 @@ export async function launchAssistantSessionChooser(
  * distinguish errors from user cancellation.
  */
 export async function launchAssistantInstallWizard(root: Root): Promise<string | null> {
-  const { NewInstallWizard, computeDefaultInstallDir } = await import('./commands/assistant/assistant.js');
+  const { NewInstallWizard, computeDefaultInstallDir } = await import('./commands/_misc/assistant/assistant.js');
   const defaultDir = await computeDefaultInstallDir();
   let rejectWithError: (reason: Error) => void;
   const errorPromise = new Promise<never>((_, reject) => {

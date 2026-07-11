@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppState, useSetAppState } from 'src/state/AppState.js';
 import { applyPermissionUpdate, persistPermissionUpdate } from 'src/utils/permissions/PermissionUpdate.js';
 import type { PermissionUpdateDestination } from 'src/utils/permissions/PermissionUpdateSchema.js';
-import type { CommandResultDisplay } from '../../../commands.js';
+import type { CommandResultDisplay } from '../../../commands/_registry/registry.js';
 import { Select } from '../../../components/CustomSelect/select.js';
 import { useExitOnCtrlCDWithKeybindings } from '../../../hooks/useExitOnCtrlCDWithKeybindings.js';
 import { useSearchInput } from '../../../hooks/useSearchInput.js';

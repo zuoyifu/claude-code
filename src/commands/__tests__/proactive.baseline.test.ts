@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
-import proactiveCommand from '../proactive'
+import proactiveCommand from '../_misc/proactive'
 import {
   activateProactive,
   deactivateProactive,

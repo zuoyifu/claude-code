@@ -1,6 +1,6 @@
 import figures from 'figures';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type { CommandResultDisplay } from '../../commands.js';
+import type { CommandResultDisplay } from '../../commands/_registry/registry.js';
 import { Box, color, Link, Text, useTheme } from '@anthropic/ink';
 import { useKeybinding } from '../../keybindings/useKeybinding.js';
 import { AuthenticationCancelledError, performMCPOAuthFlow } from '../../services/mcp/auth.js';

@@ -11,7 +11,7 @@
  */
 
 import type { TaskContext } from '../../Task.js'
-import { isPoorModeActive } from '../../commands/poor/poorMode.js'
+import { isPoorModeActive } from '../../commands/_misc/poor/poorMode.js'
 import { updateAgentSummary } from '../../tasks/LocalAgentTask/LocalAgentTask.js'
 import type { AgentId } from '../../types/ids.js'
 import { logForDebugging } from '../../utils/debug.js'

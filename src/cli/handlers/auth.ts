@@ -3,7 +3,7 @@
 import {
   clearAuthRelatedCaches,
   performLogout,
-} from '../../commands/logout/logout.js'
+} from '../../commands/model/logout/logout.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

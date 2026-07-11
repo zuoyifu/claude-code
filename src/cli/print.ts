@@ -13,7 +13,7 @@ import {
   type Command,
   formatDescriptionWithSource,
   getCommandName,
-} from 'src/commands.js'
+} from 'src/commands/_registry/registry.js'
 import { createStreamlinedTransformer } from 'src/utils/streamlinedTransform.js'
 import { installStreamJsonStdoutGuard } from 'src/utils/streamJsonStdoutGuard.js'
 import type { ToolPermissionContext } from 'src/tools/core/index.js'
@@ -260,7 +260,7 @@ import {
   toSDKRateLimitInfo,
 } from 'src/utils/messages/mappers.js'
 import { createModelSwitchBreadcrumbs } from 'src/utils/messages.js'
-import { collectContextData } from 'src/commands/context/context-noninteractive.js'
+import { collectContextData } from 'src/commands/_misc/context/context-noninteractive.js'
 import { LOCAL_COMMAND_STDOUT_TAG } from 'src/constants/xml.js'
 import {
   statusListeners,
@@ -334,7 +334,10 @@ import {
 } from 'src/utils/autonomyQueueLifecycle.js'
 import { jsonStringify } from '../utils/slowOperations.js'
 import { skillChangeDetector } from '../utils/skills/skillChangeDetector.js'
-import { getCommands, clearCommandsCache } from '../commands.js'
+import {
+  getCommands,
+  clearCommandsCache,
+} from '../commands/_registry/registry.js'
 import {
   isBareMode,
   isEnvTruthy,

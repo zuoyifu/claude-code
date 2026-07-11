@@ -17,10 +17,10 @@ import { isQueuedCommandEditable, popAllEditable } from 'src/utils/messageQueueM
 import stripAnsi from 'strip-ansi';
 import { companionReservedColumns } from '../../buddy/CompanionSprite.js';
 import { findBuddyTriggerPositions, useBuddyNotification } from '../../buddy/useBuddyNotification.js';
-import { FastModePicker } from '../../commands/fast/fast.js';
+import { FastModePicker } from '../../commands/model/fast/fast.js';
 import { isUltrareviewEnabled } from '../../commands/review/ultrareviewEnabled.js';
-import { getNativeCSIuTerminalDisplayName } from '../../commands/terminalSetup/terminalSetup.js';
-import { type Command, hasCommand } from '../../commands.js';
+import { getNativeCSIuTerminalDisplayName } from '../../commands/_misc/terminalSetup/terminalSetup.js';
+import { type Command, hasCommand } from '../../commands/_registry/registry.js';
 import { useIsModalOverlayActive } from '../../context/overlayContext.js';
 import { useSetPromptOverlayDialog } from '../../context/promptOverlayContext.js';
 import { formatImageRef, formatPastedTextRef, getPastedTextRefNumLines, parseReferences } from '../../history.js';

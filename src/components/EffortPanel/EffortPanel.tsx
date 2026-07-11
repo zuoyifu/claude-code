@@ -11,7 +11,7 @@ import {
   moveRight,
   PANEL_POSITIONS,
 } from './effortPanelState.js';
-import { executeEffort } from '../../commands/effort/effort.js';
+import { executeEffort } from '../../commands/model/effort/effort.js';
 import { useMainLoopModel } from '../../hooks/useMainLoopModel.js';
 import { useSetAppState } from '../../state/AppState.js';
 import { useRippleFrame } from './useRippleFrame.js';

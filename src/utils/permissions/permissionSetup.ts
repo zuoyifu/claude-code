@@ -43,7 +43,7 @@ import {
 import {
   addDirHelpMessage,
   validateDirectoryForWorkspace,
-} from '../../commands/add-dir/validation.js'
+} from '../../commands/files/add-dir/validation.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,

@@ -7,7 +7,7 @@ import { getIsNonInteractiveSession } from '../bootstrap/state.js'
 import { getCurrentWorktreeSession } from '../utils/worktree.js'
 import { getSessionStartDate } from './common.js'
 import { getInitialSettings } from '../utils/settings/settings.js'
-import { isPoorModeActive } from '../commands/poor/poorMode.js'
+import { isPoorModeActive } from '../commands/_misc/poor/poorMode.js'
 import {
   AGENT_TOOL_NAME,
   VERIFICATION_AGENT_TYPE,
@@ -24,7 +24,7 @@ import {
   getCanonicalName,
   getMarketingNameForModel,
 } from '../utils/model/model.js'
-import { getSkillToolCommands } from 'src/commands.js'
+import { getSkillToolCommands } from 'src/commands/_registry/registry.js'
 import { SKILL_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/SkillTool/constants.js'
 import { EXECUTE_TOOL_NAME } from '@claude-code-best/builtin-tools/tools/ExecuteTool/constants.js'
 import { getOutputStyleConfig } from './outputStyles.js'

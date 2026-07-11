@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { type Command, getCommandName } from '../../../commands.js'
+import {
+  type Command,
+  getCommandName,
+} from '../../../commands/_registry/registry.js'
 import type { SuggestionItem } from '../../../components/PromptInput/PromptInputFooterSuggestions.js'
 import {
   applyCommandSuggestion,

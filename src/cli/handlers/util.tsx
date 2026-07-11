@@ -92,7 +92,7 @@ export async function doctorHandler(root: Root): Promise<void> {
 export async function installHandler(target: string | undefined, options: { force?: boolean }): Promise<void> {
   const { setup } = await import('../../setup.js');
   await setup(cwd(), 'default', false, false, undefined, false);
-  const { install } = await import('../../commands/install.js');
+  const { install } = await import('../../commands/_misc/install.js');
   await new Promise<void>(resolve => {
     const args: string[] = [];
     if (target) args.push(target);

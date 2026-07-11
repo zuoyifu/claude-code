@@ -15,7 +15,7 @@ import {
   getDefaultExternalAutoModeRules,
 } from '../../utils/permissions/yoloClassifier.js'
 import { getAutoModeConfig } from '../../utils/settings/settings.js'
-import { isPoorModeActive } from '../../commands/poor/poorMode.js'
+import { isPoorModeActive } from '../../commands/_misc/poor/poorMode.js'
 import { sideQuery } from '../../utils/sideQuery.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 

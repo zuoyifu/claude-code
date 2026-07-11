@@ -6,7 +6,7 @@ import { describe, expect, test } from 'bun:test'
 let initVerifiers: any
 
 // Import once - no async deps
-const mod = await import('../init-verifiers.js')
+const mod = await import('../_misc/init-verifiers/index.js')
 initVerifiers = mod.default
 
 describe('init-verifiers command metadata', () => {
