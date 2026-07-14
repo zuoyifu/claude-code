@@ -297,10 +297,16 @@ export async function* queryModelOpenAI(
       deferredToolNames,
       useSearchExtraTools,
     )
+    // DeepSeek and MiMo are text-only models — they reject image_url content
+    // blocks with "unknown variant image_url, expected text". Strip images
+    // and replace with a text placeholder so the request doesn't 400.
+    const stripImages =
+      /deepseek|mimo/i.test(openaiModel) &&
+      !/vision|vl|multimodal/i.test(openaiModel)
     const openaiMessages = anthropicMessagesToOpenAI(
       messagesWithDeferredToolList,
       systemPrompt,
-      { enableThinking },
+      { enableThinking, stripImages },
     )
     const openaiTools = anthropicToolsToOpenAI(standardTools)
     const openaiToolChoice = anthropicToolChoiceToOpenAI(options.toolChoice)

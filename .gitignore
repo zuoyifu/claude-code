@@ -10,6 +10,7 @@ coverage
 *.suo
 *.lock
 src/utils/vendor/
+vendor/ripgrep/
 
 # AI tool runtime directories
 .agents/
