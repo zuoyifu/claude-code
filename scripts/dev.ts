@@ -5,6 +5,7 @@
  * dynamically imported modules at runtime).
  */
 import { join, dirname } from 'node:path'
+import { cpSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { getMacroDefines, DEFAULT_BUILD_FEATURES } from './defines.ts'
 
@@ -13,6 +14,16 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const projectRoot = join(__dirname, '..')
 const cliPath = join(projectRoot, 'src/entrypoints/cli.tsx')
+
+// Ensure vendored rg binary is accessible at vendor/ripgrep/ so ripgrep.ts
+// can find it in dev mode. The binary lives at src/utils/vendor/ripgrep/
+// (gitignored) but the runtime expects it at vendor/ripgrep/ (project root,
+// consistent with build layout dist/vendor/ripgrep/).
+const rgSrc = join(projectRoot, 'src/utils/vendor/ripgrep')
+const rgDst = join(projectRoot, 'vendor/ripgrep')
+if (existsSync(rgSrc) && !existsSync(rgDst)) {
+  cpSync(rgSrc, rgDst, { recursive: true })
+}
 
 const defines = {
   ...getMacroDefines(),

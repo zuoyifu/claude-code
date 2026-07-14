@@ -25,6 +25,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from 'src/utils/model/providers.js'
+import { clearOpenAIClientCache } from './openai/client.js'
 import {
   getAttributionHeader,
   getCLISyspromptPrefix,
@@ -1045,6 +1046,36 @@ export function stripExcessMediaItems(
  */
 const lastAnnouncedDeferredTools = new Set<string>()
 
+/**
+ * Check if any message in the conversation contains image or video content
+ * that requires a multimodal model to process properly.
+ */
+function hasVisionContent(messages: Message[]): boolean {
+  for (const msg of messages) {
+    if (msg.type !== 'user') continue
+    const content = msg.message?.content
+    if (!content || typeof content === 'string') continue
+    if (!Array.isArray(content)) continue
+    for (const block of content) {
+      if (typeof block === 'string') continue
+      if (block.type === 'image' || block.type === 'document') {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Check whether automatic vision model routing is enabled.
+ * Controlled by VISION_AUTO_ROUTE env var (defaults to enabled).
+ */
+function isVisionAutoRouteEnabled(): boolean {
+  if (process.env.VISION_AUTO_ROUTE === '0') return false
+  if (process.env.VISION_AUTO_ROUTE === 'false') return false
+  return true
+}
+
 async function* queryModel(
   messages: Message[],
   systemPrompt: SystemPrompt,
@@ -1341,6 +1372,47 @@ async function* queryModel(
   // after shared preprocessing (message normalization, tool filtering,
   // media stripping) but before Anthropic-specific logic (betas, thinking, caching).
   if (getAPIProvider() === 'openai') {
+    // Auto-route to vision model when messages contain images/videos.
+    // DeepSeek is text-only; Qwen VL (via 百炼 DashScope) handles multimodal.
+    if (hasVisionContent(messagesForAPI) && isVisionAutoRouteEnabled()) {
+      const visionModel = process.env.VISION_OPENAI_MODEL || 'qwen-vl-max'
+      const visionBaseUrl =
+        process.env.VISION_OPENAI_BASE_URL ||
+        'https://dashscope.aliyuncs.com/compatible-mode/v1'
+      const visionApiKey = process.env.VISION_OPENAI_API_KEY
+
+      if (visionApiKey) {
+        const savedBaseUrl = process.env.OPENAI_BASE_URL
+        const savedApiKey = process.env.OPENAI_API_KEY
+        const savedModel = process.env.OPENAI_MODEL
+        try {
+          process.env.OPENAI_BASE_URL = visionBaseUrl
+          process.env.OPENAI_API_KEY = visionApiKey
+          process.env.OPENAI_MODEL = visionModel
+          clearOpenAIClientCache()
+
+          logForDebugging(
+            `[VisionRoute] Auto-routing to ${visionModel} (images/video detected in messages)`,
+          )
+
+          const { queryModelOpenAI } = await import('./openai/index.js')
+          yield* queryModelOpenAI(
+            messagesForAPI,
+            systemPrompt,
+            tools,
+            signal,
+            options,
+          )
+          return
+        } finally {
+          process.env.OPENAI_BASE_URL = savedBaseUrl
+          process.env.OPENAI_API_KEY = savedApiKey
+          process.env.OPENAI_MODEL = savedModel
+          clearOpenAIClientCache()
+        }
+      }
+    }
+
     const { queryModelOpenAI } = await import('./openai/index.js')
     // OpenAI emulates Anthropic's dynamic tool loading client-side. It needs
     // the full tool pool so SearchExtraToolsTool can search deferred MCP tools that

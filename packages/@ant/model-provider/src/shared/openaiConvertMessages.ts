@@ -17,6 +17,9 @@ export interface ConvertMessagesOptions {
   /** When true, preserve thinking blocks as reasoning_content on assistant messages
    *  (required for DeepSeek thinking mode with tool calls). */
   enableThinking?: boolean
+  /** When true, replace image blocks with text placeholders instead of image_url.
+   *  Required for text-only models (DeepSeek, MiMo) that reject image_url content. */
+  stripImages?: boolean
 }
 
 /**
@@ -32,10 +35,10 @@ export interface ConvertMessagesOptions {
 export function anthropicMessagesToOpenAI(
   messages: (UserMessage | AssistantMessage)[],
   systemPrompt: SystemPrompt,
-  // options retained for API compatibility; thinking blocks are now always preserved
-  _options?: ConvertMessagesOptions,
+  options?: ConvertMessagesOptions,
 ): ChatCompletionMessageParam[] {
   const result: ChatCompletionMessageParam[] = []
+  const stripImages = options?.stripImages ?? false
 
   // Prepend system prompt as system message
   const systemText = systemPromptToText(systemPrompt)
@@ -49,7 +52,7 @@ export function anthropicMessagesToOpenAI(
   for (const msg of messages) {
     switch (msg.type) {
       case 'user':
-        result.push(...convertInternalUserMessage(msg))
+        result.push(...convertInternalUserMessage(msg, stripImages))
         break
       case 'assistant':
         result.push(...convertInternalAssistantMessage(msg))
@@ -69,6 +72,7 @@ function systemPromptToText(systemPrompt: SystemPrompt): string {
 
 function convertInternalUserMessage(
   msg: UserMessage,
+  stripImages: boolean,
 ): ChatCompletionMessageParam[] {
   const result: ChatCompletionMessageParam[] = []
   const content = msg.message.content
@@ -109,20 +113,31 @@ function convertInternalUserMessage(
       result.push(convertToolResult(tr))
     }
 
-    // 如果有图片，构建多模态 content 数组
+    // 如果有图片，构建多模态 content 数组。
+    // 如果模型不支持视觉（stripImages=true），用文本占位符替代 image_url，
+    // 避免 DeepSeek/MiMo 等纯文本模型报 400 "unknown variant image_url"。
     if (imageParts.length > 0) {
-      const multiContent: Array<
-        | { type: 'text'; text: string }
-        | { type: 'image_url'; image_url: { url: string } }
-      > = []
-      if (textParts.length > 0) {
-        multiContent.push({ type: 'text', text: textParts.join('\n') })
+      if (stripImages) {
+        const imageNote = `\n[${imageParts.length} image(s) provided but skipped — this model does not support image inputs]\n`
+        result.push({
+          role: 'user',
+          content:
+            textParts.length > 0 ? textParts.join('\n') + imageNote : imageNote,
+        } satisfies ChatCompletionUserMessageParam)
+      } else {
+        const multiContent: Array<
+          | { type: 'text'; text: string }
+          | { type: 'image_url'; image_url: { url: string } }
+        > = []
+        if (textParts.length > 0) {
+          multiContent.push({ type: 'text', text: textParts.join('\n') })
+        }
+        multiContent.push(...imageParts)
+        result.push({
+          role: 'user',
+          content: multiContent,
+        } satisfies ChatCompletionUserMessageParam)
       }
-      multiContent.push(...imageParts)
-      result.push({
-        role: 'user',
-        content: multiContent,
-      } satisfies ChatCompletionUserMessageParam)
     } else if (textParts.length > 0) {
       result.push({
         role: 'user',
