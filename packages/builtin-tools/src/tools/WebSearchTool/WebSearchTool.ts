@@ -3,7 +3,11 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from 'src/Tool.js'
 import { lazySchema } from 'src/utils/lazySchema.js'
 import { jsonStringify } from 'src/utils/slowOperations.js'
-import { createAdapter } from './adapters/index.js'
+import {
+  createAdapter,
+  FallbackSearchAdapter,
+  resolvePrimaryAdapter,
+} from './adapters/index.js'
 import { getWebSearchPrompt, WEB_SEARCH_TOOL_NAME } from './prompt.js'
 import {
   getToolUseSummary,
@@ -169,7 +173,7 @@ export const WebSearchTool = buildTool({
     const startTime = performance.now()
     const { query } = input
 
-    const adapter = createAdapter()
+    const adapter = new FallbackSearchAdapter(resolvePrimaryAdapter())
     const adapterResults = await adapter.search(query, {
       allowedDomains: input.allowed_domains,
       blockedDomains: input.blocked_domains,

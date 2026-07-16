@@ -845,7 +845,6 @@ export const getMemoryFiles = memoize(
       )
     }
 
-    // Then process Project and Local files
     const dirs: string[] = []
     const originalCwd = getOriginalCwd()
     let currentDir = originalCwd

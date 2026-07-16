@@ -1,13 +1,31 @@
 {
   "mcpServers": {
-    "claude-mem-search": {
-      "command": "J:/claude-code-portable/python/python.exe",
+    "playwright": {
+      "command": "cmd",
       "args": [
-        "J:/claude-code-portable/portable-config/hooks/claude-mem-search-mcp.py"
-      ],
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp",
+        "--headless",
+        "--browser",
+        "chromium"
+      ]
+    },
+    "crawl4ai": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "mcp-crawl4ai"]
+    },
+    "firecrawl-mcp": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "firecrawl-mcp"],
       "env": {
-        "CLAUDE_MEM_DB_PATH": "J:/claude-code-portable/portable-config/claude-mem.db"
+        "FIRECRAWL_API_KEY": "fc-4dd8685ff61548f6a056c23ba127fa88"
       }
+    },
+    "scrapling": {
+      "command": "${CLAUDE_CONFIG_DIR}/../python/Scripts/scrapling.exe",
+      "args": ["mcp"]
     }
   }
 }

@@ -25,6 +25,12 @@ afterEach(() => {
 
 describe('createAdapter', () => {
   test('prioritizes WEB_SEARCH_ADAPTER env var over all other config', () => {
+    process.env.WEB_SEARCH_ADAPTER = 'anspire'
+    expect(createAdapter().constructor.name).toBe('AnspireSearchAdapter')
+
+    process.env.WEB_SEARCH_ADAPTER = 'bocha'
+    expect(createAdapter().constructor.name).toBe('BochaSearchAdapter')
+
     process.env.WEB_SEARCH_ADAPTER = 'api'
     expect(createAdapter().constructor.name).toBe('ApiSearchAdapter')
 
@@ -67,8 +73,10 @@ describe('createAdapter', () => {
     // The actual adapter may vary if settings.webSearchAdapter is set on disk.
     // But we only assert it's one of the valid adapter types.
     const validTypes = [
+      'AnspireSearchAdapter',
       'ApiSearchAdapter',
       'BingSearchAdapter',
+      'BochaSearchAdapter',
       'BraveSearchAdapter',
       'ExaSearchAdapter',
       'TavilySearchAdapter',

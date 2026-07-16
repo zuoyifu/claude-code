@@ -50,24 +50,28 @@ export class TavilySearchAdapter implements WebSearchAdapter {
       : `${baseUrl.replace(/\/$/, '')}/search`
 
     try {
+      const body: Record<string, unknown> = {
+        query,
+        search_depth: 'basic',
+        max_results: options.numResults ?? 8,
+        include_domains: allowedDomains ?? [],
+        exclude_domains: blockedDomains ?? [],
+      }
+      // Pass user's own Tavily API key when available, so CCB proxy uses it
+      // instead of the shared proxy key (which may be rate-limited).
+      const apiKey = process.env.TAVILY_API_KEY
+      if (apiKey) {
+        body.api_key = apiKey
+      }
+
       const response = await axios.post<{
         query: string
         results: TavilySearchHit[]
-      }>(
-        searchUrl,
-        {
-          query,
-          search_depth: 'basic',
-          max_results: options.numResults ?? 8,
-          include_domains: allowedDomains ?? [],
-          exclude_domains: blockedDomains ?? [],
-        },
-        {
-          signal: abortController.signal,
-          timeout: FETCH_TIMEOUT_MS,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      }>(searchUrl, body, {
+        signal: abortController.signal,
+        timeout: FETCH_TIMEOUT_MS,
+        headers: { 'Content-Type': 'application/json' },
+      })
 
       if (abortController.signal.aborted) {
         throw new AbortError()
