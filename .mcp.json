@@ -22,10 +22,6 @@
       "env": {
         "FIRECRAWL_API_KEY": "fc-4dd8685ff61548f6a056c23ba127fa88"
       }
-    },
-    "scrapling": {
-      "command": "${CLAUDE_CONFIG_DIR}/../python/Scripts/scrapling.exe",
-      "args": ["mcp"]
     }
   }
 }

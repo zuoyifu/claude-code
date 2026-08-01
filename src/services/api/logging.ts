@@ -163,10 +163,16 @@ function getAnthropicEnvMetadata() {
 }
 
 function getBuildAgeMinutes(): number | undefined {
-  if (!MACRO.BUILD_TIME) return undefined
-  const buildTime = new Date(MACRO.BUILD_TIME).getTime()
-  if (isNaN(buildTime)) return undefined
-  return Math.floor((Date.now() - buildTime) / 60000)
+  // MACRO.* is a compile-time define (becomes a literal in builds). In tests
+  // the identifier is absent, so a bare reference throws ReferenceError —
+  // guard it so analytics logging never crashes a test run.
+  try {
+    const buildTime = new Date(MACRO.BUILD_TIME).getTime()
+    if (isNaN(buildTime)) return undefined
+    return Math.floor((Date.now() - buildTime) / 60000)
+  } catch {
+    return undefined
+  }
 }
 
 export function logAPIQuery({
