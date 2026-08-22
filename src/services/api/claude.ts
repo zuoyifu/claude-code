@@ -1046,6 +1046,14 @@ export function stripExcessMediaItems(
  */
 const lastAnnouncedDeferredTools = new Set<string>()
 
+/** One entry in the vision auto-route fallback chain. */
+interface VisionRouteAttempt {
+  label: string
+  model: string
+  baseUrl: string
+  apiKey: string | undefined
+}
+
 /**
  * Check if any message in the conversation contains image or video content
  * that requires a multimodal model to process properly.
@@ -1373,36 +1381,72 @@ async function* queryModel(
   // media stripping) but before Anthropic-specific logic (betas, thinking, caching).
   if (getAPIProvider() === 'openai') {
     // Auto-route to vision model when messages contain images/videos.
-    // DeepSeek is text-only; Qwen VL (via 百炼 DashScope) handles multimodal.
+    // Providers are tried in order: the primary (VISION_OPENAI_*, e.g. DeepSeek
+    // vision-exp) first, then an optional fallback (VISION_FALLBACK_*, e.g.
+    // Qwen VL via 百炼 DashScope) when the primary fails. Each tier can use a
+    // different endpoint and API key.
     if (hasVisionContent(messagesForAPI) && isVisionAutoRouteEnabled()) {
-      const visionModel = process.env.VISION_OPENAI_MODEL || 'qwen-vl-max'
-      const visionBaseUrl =
-        process.env.VISION_OPENAI_BASE_URL ||
-        'https://dashscope.aliyuncs.com/compatible-mode/v1'
-      const visionApiKey = process.env.VISION_OPENAI_API_KEY
+      const attempts: VisionRouteAttempt[] = [
+        {
+          label: 'primary',
+          model: process.env.VISION_OPENAI_MODEL || 'qwen-vl-max',
+          baseUrl:
+            process.env.VISION_OPENAI_BASE_URL ||
+            'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          apiKey: process.env.VISION_OPENAI_API_KEY,
+        },
+        {
+          label: 'fallback',
+          model: process.env.VISION_FALLBACK_MODEL || 'qwen-vl-max',
+          baseUrl:
+            process.env.VISION_FALLBACK_BASE_URL ||
+            'https://dashscope.aliyuncs.com/compatible-mode/v1',
+          apiKey: process.env.VISION_FALLBACK_API_KEY,
+        },
+      ].filter((attempt): attempt is VisionRouteAttempt & { apiKey: string } =>
+        Boolean(attempt.apiKey),
+      )
 
-      if (visionApiKey) {
+      if (attempts.length > 0) {
         const savedBaseUrl = process.env.OPENAI_BASE_URL
         const savedApiKey = process.env.OPENAI_API_KEY
         const savedModel = process.env.OPENAI_MODEL
         try {
-          process.env.OPENAI_BASE_URL = visionBaseUrl
-          process.env.OPENAI_API_KEY = visionApiKey
-          process.env.OPENAI_MODEL = visionModel
-          clearOpenAIClientCache()
-
-          logForDebugging(
-            `[VisionRoute] Auto-routing to ${visionModel} (images/video detected in messages)`,
-          )
-
           const { queryModelOpenAI } = await import('./openai/index.js')
-          yield* queryModelOpenAI(
-            messagesForAPI,
-            systemPrompt,
-            tools,
-            signal,
-            options,
-          )
+          for (let i = 0; i < attempts.length; i++) {
+            const attempt = attempts[i]
+            const isLast = i === attempts.length - 1
+            process.env.OPENAI_BASE_URL = attempt.baseUrl
+            process.env.OPENAI_API_KEY = attempt.apiKey
+            process.env.OPENAI_MODEL = attempt.model
+            clearOpenAIClientCache()
+
+            logForDebugging(
+              `[VisionRoute] Auto-routing to ${attempt.model} (${attempt.label}, images/video detected in messages)`,
+            )
+
+            try {
+              yield* queryModelOpenAI(
+                messagesForAPI,
+                systemPrompt,
+                tools,
+                signal,
+                options,
+              )
+              return
+            } catch (error) {
+              // Never swallow user aborts or the last attempt's error.
+              if (error instanceof APIUserAbortError || signal.aborted) {
+                throw error
+              }
+              if (isLast) {
+                throw error
+              }
+              logForDebugging(
+                `[VisionRoute] ${attempt.label} model ${attempt.model} failed, trying next: ${String(error)}`,
+              )
+            }
+          }
           return
         } finally {
           process.env.OPENAI_BASE_URL = savedBaseUrl
